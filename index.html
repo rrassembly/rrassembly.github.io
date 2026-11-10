@@ -355,7 +355,7 @@ function estCol(){return DB.doc(BASE+"/profile").collection("estimates");}
 async function pull(){
   const s=await DB.doc(BASE+"/settings").get();
   if(s.exists){const r=s.data();if(r.settings&&(r.u||0)>(S.settings.u||0)){S.settings=clone(r.settings);}else if((S.settings.u||0)>(r.u||0))dirty.settings=true;}
-  else if(S.settings.u)dirty.settings=true;
+  else dirty.settings=true;
   const d=await DB.doc(draftPath()).get();
   if(d.exists){const r=d.data();if(r.draft&&(r.u||0)>(S.draft.u||0))S.draft=clone(r.draft);else dirty.draft=true;}else dirty.draft=true;
   const q=await estCol().get();
@@ -2003,9 +2003,14 @@ async function cloudInit(){
   try{for(const m of ["app","auth","firestore"])await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-${m}-compat.js`);
     firebase.initializeApp(FB_CONFIG);FBAUTH=firebase.auth();FS=firebase.firestore();cloud.on=true;
     FBAUTH.getRedirectResult().catch(e=>{if(e&&e.code&&e.code!=="auth/no-auth-event")toast("Google sign-in didn't finish. Try again from the cloud line at the top.");});
-    FBAUTH.onAuthStateChanged(u=>{cloudOnUser(u).catch(e=>{cloudSay("Saved on this phone. Cloud backup will retry.");});});
+    FBAUTH.onAuthStateChanged(u=>cloudStart(u));
   }catch(e){cloudSay("Saved on this phone");}
 }
+let cloudRun=0;
+function tmo(p,ms){return Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms||12000))]);}
+function cloudStart(u,tries){const run=++cloudRun;tries=tries||0;
+  cloudOnUser(u,run).catch(e=>{if(run!==cloudRun)return;cloudSay("Saved on this phone. Connecting to cloud backup…");
+    setTimeout(()=>{if(run===cloudRun&&FBAUTH.currentUser)cloudStart(FBAUTH.currentUser,tries+1);},Math.min(30000,3000*(tries+1)));});}
 async function cloudSignIn(){
   if(!cloud.on){toast("Cloud backup needs an internet connection. Try again in a moment.");return;}
   const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
@@ -2014,17 +2019,18 @@ async function cloudSignIn(){
   catch(e){const c=(e&&e.code)||"";if(/popup-blocked|operation-not-supported|web-storage/.test(c)){await FBAUTH.signInWithRedirect(p);}else if(!/popup-closed|cancelled-popup/.test(c))toast("Sign-in didn't finish. "+((e&&e.message)||""));}
 }
 async function cloudSignOut(){await FBAUTH.signOut();}
-async function cloudOnUser(u){
+async function cloudOnUser(u,run){
   cloud.user=u;
   if(!u){DB=null;cloud.spaces=[];cloud.ws=null;cloudSay("Saved on this phone");clearInterval(cloudTimer);if(!gate.locked&&!ui.mode)render();return;}
   cloudSay("Connecting to your cloud backup…");
-  const uref=FS.doc(`users/${u.uid}`);let us=await uref.get();let data=us.exists?us.data():null;
+  const uref=FS.doc(`users/${u.uid}`);let us=await tmo(uref.get());let data=us.exists?us.data():null;
   const pid="p_"+u.uid;
   if(!data||!Array.isArray(data.spaces)||!data.spaces.some(s=>s.id===pid)){
-    await FS.doc(`ws/${pid}`).set({owner:u.uid,name:"Just me",shared:false,created:Date.now()},{merge:true});
-    await FS.doc(`ws/${pid}/members/${u.uid}`).set({name:u.displayName||"",email:u.email||"",owner:true});
+    await tmo(FS.doc(`ws/${pid}`).set({owner:u.uid,name:"Just me",shared:false,created:Date.now()},{merge:true}));
+    await tmo(FS.doc(`ws/${pid}/members/${u.uid}`).set({name:u.displayName||"",email:u.email||"",owner:true}));
     data={spaces:[{id:pid,name:"Just me",shared:false}].concat(((data&&data.spaces)||[]).filter(s=>s.id!==pid)),current:pid};
-    await uref.set(data,{merge:true});}
+    await tmo(uref.set(data,{merge:true}));}
+  if(run&&run!==cloudRun)return;
   cloud.spaces=data.spaces;
   const loc=cloudLocal();let want=loc.ws&&cloud.spaces.some(s=>s.id===loc.ws)?loc.ws:(data.current&&cloud.spaces.some(s=>s.id===data.current)?data.current:pid);
   if(!loc.ws){cloudLocalSet({ws:want});}
@@ -2044,7 +2050,7 @@ async function activateSpace(id,opt){opt=opt||{};
   if(cloud.user)FS.doc(`users/${cloud.user.uid}`).set({current:id},{merge:true}).catch(()=>{});
   DB=fbDB;BASE=`ws/${id}/d`;
   cloudSay(`${spaceName(id)} · syncing…`);
-  try{await pull();lastPull=Date.now();if(!S.photosSynced){(await allPhotoIds()).forEach(p=>dPhotos.add(p));S.photosSynced=true;persist();}flush();cloudSay(`${spaceName(id)} · backed up`);}
+  try{await tmo(pull(),25000);lastPull=Date.now();if(!S.photosSynced){(await allPhotoIds()).forEach(p=>dPhotos.add(p));S.photosSynced=true;persist();}flush();cloudSay(`${spaceName(id)} · backed up`);}
   catch(e){cloudSay(`${spaceName(id)} · saved on phone, will back up when online`);}
   clearInterval(cloudTimer);cloudTimer=setInterval(()=>{if(!document.hidden)cloudRefresh();},90000);
   if(!gate.locked&&!ui.mode)render();
