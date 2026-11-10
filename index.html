@@ -276,7 +276,7 @@ textarea.copy{min-height:12rem;font-family:ui-monospace,Menlo,monospace;font-siz
 const SV=[{id:"move",n:"Move"},{id:"remove",n:"Haul away"},{id:"install",n:"Install"},{id:"service",n:"Maintenance"},{id:"repair",n:"Repair"}];
 const SVN=Object.fromEntries(SV.map(s=>[s.id,s.n]));
 const SV_=(p)=>`<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${p}</svg>`;
-const ICON2={inbox:SV_('<path d="M3 13l2.5-7.5h13L21 13v6H3z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/>'),clip:SV_('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 11h7M8.5 15h5"/>'),calc:SV_('<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8.5 6.5h7M8.5 11h1M12 11h1M8.5 14.5h1M12 14.5h1M8.5 18h1M12 18h1M15.5 11v7"/>'),user:SV_('<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>'),folder:SV_('<path d="M3.5 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),doc:SV_('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>'),book:SV_('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/>'),share:SV_('<path d="M12 15V3M7.5 7.5L12 3l4.5 4.5M5 12v8h14v-8"/>'),gear:SV_('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'),camera:SV_('<path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>')};
+const ICON2={inbox:SV_('<path d="M3 13l2.5-7.5h13L21 13v6H3z"/><path d="M3 13h5l1.5 2.5h5L16 13h5"/>'),clip:SV_('<rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4h6v3H9zM8.5 11h7M8.5 15h5"/>'),calc:SV_('<rect x="5" y="2.5" width="14" height="19" rx="2"/><path d="M8.5 6.5h7M8.5 11h1M12 11h1M8.5 14.5h1M12 14.5h1M8.5 18h1M12 18h1M15.5 11v7"/>'),user:SV_('<circle cx="12" cy="8" r="3.5"/><path d="M5 20a7 7 0 0 1 14 0"/>'),folder:SV_('<path d="M3.5 7a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8.5a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/>'),doc:SV_('<path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>'),book:SV_('<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/>'),share:SV_('<path d="M12 15V3M7.5 7.5L12 3l4.5 4.5M5 12v8h14v-8"/>'),gear:SV_('<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'),car:SV_('<path d="M5 16.5V12l2-5h10l2 5v4.5"/><path d="M3.5 16.5h17v3h-17zM5 12h14"/><circle cx="7.5" cy="19.5" r="1.3"/><circle cx="16.5" cy="19.5" r="1.3"/>'),pin:SV_('<path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/>'),camera:SV_('<path d="M4 8h3l1.5-2.5h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>')};
 const ICON={...ICON2,trash:`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4.5h6V7M6.5 7l1 13h9l1-13M10 11v5.5M14 11v5.5"/></svg>`,
  lock:`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>`,
  unlock:`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 7.7-1.5"/></svg>`};
@@ -425,9 +425,9 @@ function render(){
   renderOwner();renderNav();
   const keep=main.scrollTop;
   document.getElementById("title").textContent=S.settings.company||"Estimates";
-  const tabFor={saved:"more",prices:"more",requests:"more",docs:"more",export:"more",import:"more",cform:"more"};const curTab=tabFor[ui.view]||ui.view;
+  const tabFor={saved:"more",prices:"more",requests:"more",docs:"more",export:"more",import:"more",cform:"more",mileage:"more"};const curTab=tabFor[ui.view]||ui.view;
   document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-current",b.dataset.v===curTab?"page":"false"));
-  const V={estimate:viewEstimate,saved:()=>backMore()+viewSaved(),pm:viewPM,prices:()=>backMore()+viewPrices(),home:viewHome,jobs:viewJobs,more:viewMore,requests:viewRequests,docs:viewDocs,export:viewExport,import:viewImport,cform:viewCformHub};
+  const V={estimate:viewEstimate,saved:()=>backMore()+viewSaved(),pm:viewPM,prices:()=>backMore()+viewPrices(),home:viewHome,jobs:viewJobs,more:viewMore,requests:viewRequests,docs:viewDocs,export:viewExport,import:viewImport,cform:viewCformHub,mileage:viewMileage};
   main.innerHTML=(V[ui.view]||viewHome)();
   main.scrollTop=keep;
   renderBar();renderSheet();hydratePhotos();
@@ -530,7 +530,7 @@ function viewPrices(){
   return h;
 }
 
-const CONFIRM={del:["Delete this estimate?","Delete"],item:["Remove this equipment from your price list?","Remove"],reset:["Reset all prices to the samples? Your own prices will be replaced.","Reset prices"],new:["Start a new estimate? The one on screen isn't saved yet.","Start new"],log:["Delete this history entry?","Delete"],mach:["Delete this machine and its history?","Delete machine"],site:["Delete this customer and all their machines?","Delete customer"],part:["Remove this part?","Remove"],job:["Delete this job? Its photos will be deleted too.","Delete job"],inv:["Delete this invoice?","Delete invoice"],tip:["Delete this service tip?","Delete tip"],photo:["Delete this photo?","Delete photo"],pay:["Remove this payment?","Remove"]};
+const CONFIRM={del:["Delete this estimate?","Delete"],item:["Remove this equipment from your price list?","Remove"],reset:["Reset all prices to the samples? Your own prices will be replaced.","Reset prices"],new:["Start a new estimate? The one on screen isn't saved yet.","Start new"],log:["Delete this history entry?","Delete"],mach:["Delete this machine and its history?","Delete machine"],site:["Delete this customer and all their machines?","Delete customer"],part:["Remove this part?","Remove"],job:["Delete this job? Its photos will be deleted too.","Delete job"],inv:["Delete this invoice?","Delete invoice"],tip:["Delete this service tip?","Delete tip"],photo:["Delete this photo?","Delete photo"],trip:["Delete this trip from the mileage log?","Delete trip"],pay:["Remove this payment?","Remove"]};
 function askConfirm(key,el){const k=key.split(":")[0];ui.pendingArm=key;ui.confirmEl=el;ui.confirmMsg=CONFIRM[k]||["Are you sure?","Yes"];ui.sheet="confirm";renderSheet();}
 /* ---------- sheets (review, import, copy) ---------- */
 const overlay=document.getElementById("overlay");
@@ -539,6 +539,7 @@ function renderSheet(){
   let title="",body="";
   if(ui.sheet==="review"){title="Estimate";body=reviewBody();}
   else if(ui.sheet==="doc"){title="Estimate preview";body=`${docPreviewHTML(docData(S.draft))}<button class="btn pri wide" data-act="senddoc">Send estimate to customer (PDF)</button><p class="hint">You can hand your phone to the customer to look at this.</p>`;}
+  else if(ui.sheet==="trip"&&ui.trip){title=ui.tripEdit?"Trip":"Log a trip";body=tripForm(ui.trip,ui.tripEdit);}
   else if(ui.sheet==="reqdetail"){const r=getReq(ui.reqId);title="Customer's form";body=`<div style="white-space:pre-wrap;font-size:1.05rem;line-height:1.5">${esc(r?r.details:"")}</div>${r&&r.status==="new"?`<div class="btns"><button class="btn pri" data-act="reqjob" data-id="${r.id}">Make a job</button><button class="btn" data-act="reqest" data-id="${r.id}">Estimate</button></div>`:""}`;}
   else if(opsSheet()){[title,body]=opsSheet();}
   else if(ui.sheet==="confirm"){title="Please confirm";body=`<div class="confirm stack"><p>${esc(ui.confirmMsg[0])}</p><div class="btns"><button class="btn" data-act="close">No, go back</button><button class="btn danger fill" data-act="confirmyes">${esc(ui.confirmMsg[1])}</button></div></div>`;}
@@ -713,7 +714,7 @@ function applyImport(){
 }
 
 /* ---------- backup ---------- */
-function backupObj(){return{app:"gym-estimator",v:2,exported:Date.now(),settings:S.settings,estimates:S.estimates,draft:S.draft,pm:{sites:S.pm.sites},requests:S.requests,jobs:S.jobs,invoices:S.invoices,docs:S.docs};}
+function backupObj(){return{app:"gym-estimator",v:2,exported:Date.now(),settings:S.settings,estimates:S.estimates,draft:S.draft,pm:{sites:S.pm.sites},requests:S.requests,jobs:S.jobs,invoices:S.invoices,docs:S.docs,trips:S.trips||[]};}
 function backupText(){return JSON.stringify(backupObj());}
 async function backupTextFull(){const o=backupObj();o.photos={};for(const id of await allPhotoIds()){const d=await photoGet(id);if(d)o.photos[id]=d;}return JSON.stringify(o);}
 function backupName(){const d=new Date();const p=n=>String(n).padStart(2,"0");return`rr-assembly-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;}
@@ -927,6 +928,7 @@ function reminders(){
   });
   S.invoices.forEach(v=>{const st=invStatus(v);if(st!=="overdue")return;if(v.remindedAt&&daysBetween(v.remindedAt,t)<7)return;const tt=invTotals(v);const late=daysBetween(v.due,t);
     out.push({key:"inv:"+v.id+":"+(v.remindedAt||""),kind:"down",inv:v.id,title:`Invoice #${v.no} is ${late} day${late===1?"":"s"} late`,sub:`${v.custName||""} · ${money(tt.balance)} owed${v.remindedAt?" · last reminder "+fmtDate(v.remindedAt):""}`,date:addDays(t,1),cal:{title:`Follow up: invoice #${v.no} (${v.custName||""})`,date:addDays(t,1),details:`${money(tt.balance)} owed, due ${fmtDate(v.due)}`}});});
+  out.push(...mileReminders(t));
   return out.filter(r=>!(sn[r.key]&&sn[r.key]>t)).sort((a,b)=>(a.kind==="down"?0:1)-(b.kind==="down"?0:1));
 }
 function addDays(x,n){const [y,m,d]=x.split("-").map(Number);const dt=new Date(y,m-1,d+n);return`${dt.getFullYear()}-${p2(dt.getMonth()+1)}-${p2(dt.getDate())}`;}
@@ -945,7 +947,7 @@ function calButtons(c,key){return`<a class="btn" href="${esc(gcalLink(c))}" targ
 function remindersCard(list,limit){
   if(!list.length)return"";
   window.__calMap=window.__calMap||{};list.forEach(r=>{window.__calMap[r.key]=r.cal;});
-  return`<section class="sec"><h2><span>Reminders</span><span>${list.length}</span></h2><div class="list">${list.slice(0,limit||50).map(r=>`<div class="rem"><button class="rh" data-act="${r.inv?"openinv":r.mach?"pmmachine":"pmsite"}" data-site="${r.site||""}" data-id="${r.inv||r.mach||r.site}"><span class="dot ${r.kind}" aria-hidden="true"></span><span style="flex:1;min-width:0"><b style="display:block">${esc(r.title)}</b><small class="muted">${esc(r.sub)}</small></span></button>
+  return`<section class="sec"><h2><span>Reminders</span><span>${list.length}</span></h2><div class="list">${list.slice(0,limit||50).map(r=>`<div class="rem"><button class="rh" data-act="${r.inv?"openinv":r.mile?"tpopen":r.mileYear?"mileyeargo":r.mach?"pmmachine":"pmsite"}" data-site="${r.site||""}" data-id="${r.inv||r.mile||r.mach||r.site}" data-v="${r.mileYear||""}"><span class="dot ${r.kind}" aria-hidden="true"></span><span style="flex:1;min-width:0"><b style="display:block">${esc(r.title)}</b><small class="muted">${esc(r.sub)}</small></span></button>
   <div class="acts">${r.inv?`<button class="btn pri" data-act="invremind" data-id="${r.inv}">Send reminder</button><button class="btn" data-act="snooze" data-key="${esc(r.key)}" aria-label="Remind me tomorrow">Tomorrow</button><a class="btn" href="${esc(gcalLink(r.cal))}" target="_blank" rel="noopener">Google Cal</a>`:`<button class="btn" data-act="snooze" data-key="${esc(r.key)}" aria-label="Remind me tomorrow">Tomorrow</button>${calButtons(r.cal,r.key)}`}</div></div>`).join("")}</div></section>`;
 }
 function renderNav(){const b=document.getElementById("hometab");if(!b)return;const n=reminders().length+S.requests.filter(r=>r.status==="new").length;let bd=b.querySelector(".badge");if(n){if(!bd){bd=document.createElement("span");bd.className="badge";b.appendChild(bd);}bd.textContent=n;b.setAttribute("aria-label",`Home, ${n} thing${n>1?"s":""} need attention`);}else{if(bd)bd.remove();b.setAttribute("aria-label","Home");}}
@@ -1172,10 +1174,10 @@ const REQ2JOB={service:"Service call",delivery:"Delivery",pma:"Maintenance visit
 const JST={scheduled:"Scheduled",progress:"Working on it",done:"Finished"};
 const JSTCLS={scheduled:"watch",progress:"watch",done:"ok"};
 const PAYM=["Cash","Check","Card","Online","Other"];
-const OPK=["requests","jobs","invoices","docs"];
+const OPK=["requests","jobs","invoices","docs","trips"];
 OPK.forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});S.opsDel=S.opsDel||{};
 if(!S.settings.company)S.settings.company="R&R Assembly Services";
-const dOps={requests:new Set(),jobs:new Set(),invoices:new Set(),docs:new Set()};
+const dOps={requests:new Set(),jobs:new Set(),invoices:new Set(),docs:new Set(),trips:new Set()};
 const xOps={};OPK.forEach(k=>xOps[k]=new Set(S.opsDel[k]||[]));
 function touchOp(kind,o){o.u=Date.now();dOps[kind].add(o.id);persist();}
 function delOp(kind,id){S[kind]=S[kind].filter(x=>x.id!==id);dOps[kind].delete(id);xOps[kind].add(id);S.opsDel[kind]=[...xOps[kind]];persist();}
@@ -1263,7 +1265,8 @@ function viewHome(){
   const t=today();let h=`<div><h2 class="sub-h" style="font-size:1.5rem">Today</h2><div class="muted" style="font-weight:700">${esc(weekday(t))}</div></div>`;
   h+=backupNudge();
   h+=`<div class="qgrid"><button class="qbtn" data-act="newreq"><span aria-hidden="true">${ICON.inbox}</span>New request</button><button class="qbtn" data-act="newjob"><span aria-hidden="true">${ICON.clip}</span>New job</button><button class="qbtn" data-act="view" data-v="estimate"><span aria-hidden="true">${ICON.calc}</span>New estimate</button><button class="qbtn" data-act="newcust"><span aria-hidden="true">${ICON.user}</span>New customer</button></div>
-  <button class="formbtn" data-act="cfhub"><span class="mi" aria-hidden="true">${ICON.doc}</span><span style="flex:1">Customer request form<small class="muted" style="display:block;font-weight:400">Let a customer fill in their own request</small></span><span class="chev" aria-hidden="true">›</span></button>`;
+  <button class="formbtn" data-act="cfhub"><span class="mi" aria-hidden="true">${ICON.doc}</span><span style="flex:1">Customer request form<small class="muted" style="display:block;font-weight:400">Let a customer fill in their own request</small></span><span class="chev" aria-hidden="true">›</span></button>
+  <button class="formbtn" data-act="milehub" style="border-style:solid;background:var(--surface);border-color:var(--line)"><span class="mi" aria-hidden="true">${ICON.car}</span><span style="flex:1">Mileage and gas<small class="muted" style="display:block;font-weight:400">${(()=>{const s=sumTrips((S.trips||[]).filter(t=>t.date.startsWith(today().slice(0,7))));return s.trips?`${fmtMi(s.miles)} miles this month · ${money(s.gas)} gas`:"Log trips and figure gas cost";})()}</small></span><span class="chev" aria-hidden="true">›</span></button>`;
   const todays=S.jobs.filter(j=>j.status!=="done"&&j.date&&j.date<=t).sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
   const next=S.jobs.filter(j=>j.status!=="done"&&j.date>t).sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||""))).slice(0,3);
   h+=`<section class="sec"><h2><span>Today's jobs</span><span>${todays.length||""}</span></h2><div class="list">${todays.map(j=>jobRow(j,j.date!==t)).join("")||`<div class="empty">No jobs today.${next.length?"":" Tap New job to schedule one."}</div>`}</div></section>`;
@@ -1317,6 +1320,7 @@ function viewJob(j){
   ${ui.jobAdd?`<div class="addpart"><input type="text" id="ji-desc" placeholder="Part or charge, e.g. Drive belt" aria-label="Part or charge"><div class="row2"><input type="text" inputmode="decimal" id="ji-qty" value="1" aria-label="How many"><div class="money"><input type="text" inputmode="decimal" id="ji-unit" placeholder="Price each" aria-label="Price each"></div></div>${ui.owner?`<div class="money"><input type="text" inputmode="decimal" id="ji-cost" placeholder="Your cost each (only you see this)" aria-label="Your cost each"></div>`:""}<div class="btns"><button class="btn" data-act="jobaddcancel">Cancel</button><button class="btn pri" data-act="jobitemadd">Add</button></div></div>`:`<div class="addpart"><button class="btn add" data-act="jobaddopen">+ Add a part or charge</button></div>`}</div></section>`;
   h+=`<div class="card stack"><h2 class="sub-h">Hours worked</h2><div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap"><div class="step"><button data-act="jobhours" data-d="-0.5" aria-label="Half hour less">−</button><input class="num" inputmode="decimal" id="jf-hours" data-jf="hours" value="${+j.hours||""}" placeholder="0" aria-label="Hours worked" style="width:4rem"><button class="plus" data-act="jobhours" data-d="0.5" aria-label="Half hour more">+</button></div><label class="f" style="flex:1;min-width:8rem;font-weight:400">Rate per hour<div class="money"><input type="text" inputmode="decimal" id="jf-rate" data-jf="rate" value="${+j.rate||""}" placeholder="0"></div></label></div>
   <div class="row" style="display:flex;justify-content:space-between;font-size:1.15rem;font-weight:700"><span>Job total</span><span id="jobtotal">${money(tot)}</span></div>${ui.owner?`<div class="row" style="display:flex;justify-content:space-between;color:var(--good);font-weight:700"><span>You keep (before tax)</span><span>${money(tot-cost)}</span></div>`:""}</div>`;
+  h+=`<button class="btn wide" data-act="tpnew" data-job="${j.id}">${ICON.car} ${(S.trips||[]).some(t=>t.jobId===j.id)?"Log another trip for this job":"Log mileage for this job"}</button>`;
   h+=`<label class="f">Notes<textarea id="jf-notes" data-jf="notes" placeholder="Gate code, who to ask for, what you found…">${esc(j.notes||"")}</textarea></label>`;
   h+=`<section class="sec"><h2><span>Photos</span><span>${(j.photos||[]).length||""}</span></h2>${photoGrid(j.photos||[],"jobphotoview")}<label class="btn filebtn wide" style="margin-top:.5rem">${ICON.camera} Add a photo<input type="file" accept="image/*" capture="environment" data-act="jobphoto" aria-label="Take or choose a photo"></label></section>`;
   // tips
@@ -1353,7 +1357,7 @@ function viewInvoice(v){
   return h;
 }
 function viewMore(){
-  const items=[["saved","Saved estimates",`${S.estimates.length}`,ICON.folder],["invoices","Invoices",`${S.invoices.filter(v=>invStatus(v)!=="paid").length} open`,ICON.doc],["cform","Customer request form","",ICON.inbox],["requests","All requests",`${S.requests.filter(r=>r.status==="new").length} new`,ICON.inbox],["docs","Service tips",`${S.docs.length}`,ICON.book],["export","Export for QuickBooks","",ICON.share],["prices","Settings and prices","",ICON.gear]];
+  const items=[["saved","Saved estimates",`${S.estimates.length}`,ICON.folder],["invoices","Invoices",`${S.invoices.filter(v=>invStatus(v)!=="paid").length} open`,ICON.doc],["mileage","Mileage and gas","",ICON.car],["cform","Customer request form","",ICON.inbox],["requests","All requests",`${S.requests.filter(r=>r.status==="new").length} new`,ICON.inbox],["docs","Service tips",`${S.docs.length}`,ICON.book],["export","Export for QuickBooks","",ICON.share],["prices","Settings and prices","",ICON.gear]];
   return`<h2 class="sub-h" style="font-size:1.4rem">More</h2><div class="list">${items.map(([v,l,c,ic])=>`<button class="est" data-act="${v==="invoices"?"gotoinv":"view"}" data-v="${v}"><span style="display:flex;gap:.85rem;align-items:center;flex:1;min-width:0"><span class="mi" aria-hidden="true">${ic}</span><b>${l}</b></span><span class="muted">${c}</span><span class="chev" aria-hidden="true">›</span></button>`).join("")}</div>`;
 }
 function viewRequests(){
@@ -1464,7 +1468,7 @@ async function opsClick(a,el){
     case"expinv":exportCSV("inv");break;
     case"exppay":exportCSV("pay");break;
     case"estjob":{const d=S.draft;ensureEstimateNo(d);saveDraftAsEstimate();const x=siteByName(d.customer);const nj=makeJob({custId:x?x.id:null,custName:d.customer,site:d.site||(x&&x.address)||"",kind:"Delivery",desc:`From estimate #${d.no}`,estId:d.id,items:linesFromEstimate(d).map(l=>({id:uid(),desc:l.desc,qty:l.qty,unit:l.unit,cost:l.cost}))});ui.sheet=null;openJob(nj.id);toast("Job made from the estimate. Pick a date.");break;}
-    default:if(!pimpClick(a,el))await cformClick(a,el);break;
+    default:if(!pimpClick(a,el)&&!mileClick(a,el))await cformClick(a,el);break;
     case"estinv":{const d=S.draft;ensureEstimateNo(d);saveDraftAsEstimate();const x=siteByName(d.customer);const nv=newInvoice({custId:x?x.id:null,custName:d.customer,site:d.site||"",lines:linesFromEstimate(d),discount:+d.discount||0,applyTax:!!d.tax,estId:d.id,notes:`Estimate #${d.no}`,otherCost:+d.otherCost||0});ui.sheet=null;ui.invId=nv.id;ui.jobId=null;ui.view="jobs";ui.jobsSeg="invoices";main.scrollTop=0;render();break;}
   }
 }
@@ -1472,7 +1476,7 @@ function makeJob(f){const st=S.settings;const nj=Object.assign({id:uid(),no:next
   if(!nj.custId&&nj.custName){let x=siteByName(nj.custName);if(!x){x=newSite(nj.custName);x.address=nj.site||"";S.pm.sites.push(x);touchSite(x);}nj.custId=x.id;}
   S.jobs.unshift(nj);touchOp("jobs",nj);return nj;}
 function openJob(id){ui.jobId=id;ui.invId=null;ui.jobAdd=false;ui.view="jobs";ui.jobsSeg="jobs";main.scrollTop=0;render();}
-function finishJob(j){j.status="done";j.doneDate=today();const x=j.custId&&getSite(j.custId);
+function finishJob(j){setTimeout(()=>autoLogJobTrip(j),50);j.status="done";j.doneDate=today();const x=j.custId&&getSite(j.custId);
   if(x){(j.machines||[]).forEach(mid=>{const m=x.machines.find(z=>z.id===mid);if(m){m.log=m.log||[];m.log.push({id:uid(),date:today(),kind:j.kind==="Maintenance visit"?"PM":j.kind==="Repair"||j.kind==="Service call"?"Repair":"Other",note:`Job #${j.no}${j.desc?": "+j.desc:""}`});}});
     if(j.kind==="Maintenance visit"){x.lastPM=today();x.visits=x.visits||[];if(!x.visits.some(z=>z.date===x.lastPM))x.visits.push({date:x.lastPM});}touchSite(x);}
   touchOp("jobs",j);}
@@ -1786,6 +1790,192 @@ async function gateChange(cur,next,again){if(!/^\d{4,10}$/.test(next)){toast("Th
   toast("App PIN changed on this phone");return true;}
 function gateLockNow(){try{sessionStorage.removeItem(GATE_SES);}catch(e){}ui.owner=false;gateShow();}
 
+/* ---------- Mileage log and gas cost calculator ---------- */
+const ST_ABBR={alabama:"AL",alaska:"AK",arizona:"AZ",arkansas:"AR",california:"CA",colorado:"CO",connecticut:"CT",delaware:"DE","district of columbia":"DC",florida:"FL",georgia:"GA",hawaii:"HI",idaho:"ID",illinois:"IL",indiana:"IN",iowa:"IA",kansas:"KS",kentucky:"KY",louisiana:"LA",maine:"ME",maryland:"MD",massachusetts:"MA",michigan:"MI",minnesota:"MN",mississippi:"MS",missouri:"MO",montana:"MT",nebraska:"NE",nevada:"NV","new hampshire":"NH","new jersey":"NJ","new mexico":"NM","new york":"NY","north carolina":"NC","north dakota":"ND",ohio:"OH",oklahoma:"OK",oregon:"OR",pennsylvania:"PA","rhode island":"RI","south carolina":"SC","south dakota":"SD",tennessee:"TN",texas:"TX",utah:"UT",vermont:"VT",virginia:"VA",washington:"WA","west virginia":"WV",wisconsin:"WI",wyoming:"WY"};
+const EIA_STATE={CA:"SCA",CO:"SCO",FL:"SFL",MA:"SMA",MN:"SMN",NY:"SNY",OH:"SOH",TX:"STX",WA:"SWA"};
+const EIA_REGION=[["R1X","New England",["CT","ME","MA","NH","RI","VT"]],["R1Y","Central Atlantic",["DE","DC","MD","NJ","NY","PA"]],["R1Z","Lower Atlantic",["FL","GA","NC","SC","VA","WV"]],["R20","Midwest",["IL","IN","IA","KS","KY","MI","MN","MO","NE","ND","OH","OK","SD","TN","WI"]],["R30","Gulf Coast",["AL","AR","LA","MS","NM","TX"]],["R40","Rocky Mountain",["CO","ID","MT","UT","WY"]],["R50","West Coast",["AK","AZ","CA","HI","NV","OR","WA"]]];
+const MILE_RATES_DEFAULT=[{from:"2025-01-01",rate:0.70},{from:"2026-01-01",rate:0.725},{from:"2026-07-01",rate:0.76}];
+if(!Array.isArray(S.settings.vehicles)||!S.settings.vehicles.length)S.settings.vehicles=[{id:"v1",name:"Work truck",mpg:15,fuel:"regular"}];
+function mileRate(date){const rs=(S.settings.mileRates&&S.settings.mileRates.length?S.settings.mileRates:MILE_RATES_DEFAULT).slice().sort((a,b)=>a.from.localeCompare(b.from));let r=rs[0].rate;rs.forEach(x=>{if(date>=x.from)r=+x.rate;});return r;}
+function tripMiles(t){return Math.round((+t.miles||0)*(t.round?2:1)*10)/10;}
+function tripGas(t){const v=S.settings.vehicles.find(x=>x.id===t.vehicleId)||{};const mpg=+t.mpg||+v.mpg||0;const pr=+t.gasPrice||0;return mpg&&pr?Math.round(tripMiles(t)/mpg*pr*100)/100:0;}
+function fmtMi(n){return(Math.round(n*10)/10).toLocaleString("en-US",{maximumFractionDigits:1});}
+/* online lookups (cached) */
+const geoCache=new Map();let lastGeo=0;
+async function geocode(q){q=String(q||"").trim();if(!q)return null;if(geoCache.has(q))return geoCache.get(q);
+  const wait=Math.max(0,1100-(Date.now()-lastGeo));if(wait)await new Promise(r=>setTimeout(r,wait));lastGeo=Date.now();
+  const r=await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&addressdetails=1&q=${encodeURIComponent(q)}`,{headers:{Accept:"application/json"}});
+  if(!r.ok)throw new Error("lookup");const j=await r.json();if(!j.length)return null;const a=j[0].address||{};
+  const g={lat:+j[0].lat,lon:+j[0].lon,state:ST_ABBR[(a.state||"").toLowerCase()]||"",zip:a.postcode||"",city:a.city||a.town||a.village||a.hamlet||"",label:j[0].display_name};geoCache.set(q,g);return g;}
+async function reverseGeo(lat,lon){const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`);const j=await r.json();const a=j.address||{};
+  return{text:[[a.house_number,a.road].filter(Boolean).join(" "),a.city||a.town||a.village||"",ST_ABBR[(a.state||"").toLowerCase()]||"",a.postcode||""].filter(Boolean).join(", "),state:ST_ABBR[(a.state||"").toLowerCase()]||""};}
+async function roadMiles(a,b){const r=await fetch(`https://router.project-osrm.org/route/v1/driving/${a.lon},${a.lat};${b.lon},${b.lat}?overview=false`);const j=await r.json();if(j.code!=="Ok"||!j.routes||!j.routes[0])throw new Error("route");return{miles:Math.round(j.routes[0].distance/1609.344*10)/10,mins:Math.round(j.routes[0].duration/60)};}
+function eiaArea(st){if(EIA_STATE[st])return[EIA_STATE[st],`${st} average`];const r=EIA_REGION.find(x=>x[2].includes(st));return r?[r[0],`${r[1]} average`]:["NUS","U.S. average"];}
+async function gasPriceFor(state,fuel){fuel=fuel==="diesel"?"diesel":"regular";const st=S.settings;st.gasCache=st.gasCache||{};const key=st.eiaKey&&state?`eia:${eiaArea(state)[0]}:${fuel}`:`us:${fuel}`;const c=st.gasCache[key];
+  if(c&&Date.now()-c.at<6*3600e3)return c;
+  try{
+    if(st.eiaKey&&state){const [area,label]=eiaArea(state);const prod=fuel==="diesel"?"EPD2D":"EPMR";
+      const r=await fetch(`https://api.eia.gov/v2/petroleum/pri/gnd/data/?api_key=${encodeURIComponent(st.eiaKey)}&frequency=weekly&data[0]=value&facets[duoarea][]=${area}&facets[product][]=${prod}&sort[0][column]=period&sort[0][direction]=desc&length=1`);
+      const j=await r.json();const row=j&&j.response&&j.response.data&&j.response.data[0];
+      if(row&&+row.value){const v={price:+row.value,src:`${label}, week of ${fmtDate(row.period)} (U.S. Energy Information Admin.)`,at:Date.now()};st.gasCache[key]=v;persist();return v;}}
+    const r=await fetch("https://www.fueleconomy.gov/ws/rest/fuelprices",{headers:{Accept:"application/json"}});const j=await r.json();const p=+j[fuel];
+    if(p){const v={price:p,src:`U.S. average today (fueleconomy.gov)${st.eiaKey?"":". Add a free key in Mileage settings for local prices"}`,at:Date.now()};st.gasCache[`us:${fuel}`]=v;persist();return v;}
+  }catch(e){}
+  const any=c||st.gasCache[`us:${fuel}`];if(any)return Object.assign({},any,{src:any.src+" (saved earlier, no signal now)"});
+  return null;}
+function gasbuddyLink(g,to){return`https://www.gasbuddy.com/home?search=${encodeURIComponent((g&&g.zip)||to||"")}&fuel=${1}`;}
+/* the trip / calculator form state */
+function newTrip(f){const st=S.settings;return Object.assign({id:uid(),date:today(),from:st.homeBase||"",to:"",miles:"",round:true,purpose:"Job",note:"",jobId:null,custName:"",vehicleId:(st.vehicles[0]||{}).id,mpg:"",gasPrice:"",priceSrc:"",state:"",zip:""},f||{});}
+function tripForm(t,isEdit){const st=S.settings;const v=st.vehicles.find(x=>x.id===t.vehicleId)||st.vehicles[0]||{};const tm=tripMiles(t),gas=tripGas(t);
+  const jobs=S.jobs.filter(j=>j.status!=="done"||j.doneDate>=addDays(today(),-30)).slice(0,30);
+  return`<div class="stack">
+  <label class="f">Starting from<div style="display:flex;gap:.5rem"><input type="text" id="tp-from" data-tp="from" value="${esc(t.from)}" placeholder="Shop or home address" style="flex:1"><button class="btn sm" data-act="tpmyloc" aria-label="Use my location">${ICON.pin||"📍"}</button></div></label>
+  <label class="f">Going to<input type="text" id="tp-to" data-tp="to" value="${esc(t.to)}" placeholder="Address, city or ZIP" list="tp-places"><datalist id="tp-places">${S.pm.sites.filter(x=>x.address).map(x=>`<option value="${esc(x.address)}">${esc(x.name)}</option>`).join("")}</datalist></label>
+  <button class="btn dark wide" data-act="tpfind">Find the miles and gas price</button>
+  <p class="hint" id="tp-status" aria-live="polite">${esc(ui.tpStatus||"")}</p>
+  <div class="row2"><label class="f">Miles one way<input type="text" inputmode="decimal" id="tp-miles" data-tp="miles" value="${esc(t.miles)}" placeholder="0"></label><label class="f">Trip<select id="tp-round" data-tp="round"><option value="1"${t.round?" selected":""}>Round trip</option><option value="0"${!t.round?" selected":""}>One way</option></select></label></div>
+  <div class="row2"><label class="f">Vehicle<select id="tp-veh" data-tp="vehicleId">${st.vehicles.map(x=>`<option value="${x.id}"${x.id===t.vehicleId?" selected":""}>${esc(x.name)} (${+x.mpg||"?"} mpg)</option>`).join("")}</select></label><label class="f">Gas price / gallon<div class="money"><input type="text" inputmode="decimal" id="tp-price" data-tp="gasPrice" value="${t.gasPrice?(+t.gasPrice).toFixed(2):""}" placeholder="0.00"></div></label></div>
+  ${t.priceSrc?`<p class="hint" style="margin-top:-.4rem">${esc(t.priceSrc)}${t.to?` · <a href="${esc(gasbuddyLink({zip:t.zip},t.to))}" target="_blank" rel="noopener">See pump prices near there</a>`:""}</p>`:""}
+  <div class="jobsum" style="border-color:var(--accent)"><div class="row"><span>Total miles</span><b id="tp-tm">${fmtMi(tm)}</b></div><div class="row"><span>Gas for this trip</span><b id="tp-gas">${money(gas)}</b></div><div class="row"><span class="muted">IRS mileage value (${(mileRate(t.date)*100).toFixed(1)}¢/mi)</span><span id="tp-irs">${money(tm*mileRate(t.date))}</span></div></div>
+  <div class="row2"><label class="f">Date<input type="date" id="tp-date" data-tp="date" value="${esc(t.date)}"></label><label class="f">What for<select id="tp-purpose" data-tp="purpose">${["Job","Estimate visit","Parts or supplies","Delivery","Office or bank","Other business","Personal"].map(p=>`<option${t.purpose===p?" selected":""}>${p}</option>`).join("")}</select></label></div>
+  ${jobs.length?`<label class="f">Job (optional)<select id="tp-job" data-tp="jobId"><option value="">None</option>${jobs.map(j=>`<option value="${j.id}"${t.jobId===j.id?" selected":""}>#${j.no} ${esc(j.custName)} ${j.date?"· "+esc(fmtDate(j.date)):""}</option>`).join("")}</select></label>`:""}
+  <label class="f">Note<input type="text" id="tp-note" data-tp="note" value="${esc(t.note||"")}" placeholder="Optional"></label>
+  <button class="btn pri wide" data-act="tpsave" style="min-height:3.5rem;font-size:1.1rem">${isEdit?"Save changes":"Save to mileage log"}</button>
+  ${isEdit?`<button class="btn danger" data-act="tpdel">Delete trip</button>`:""}</div>`;}
+function tripFormRefresh(){const t=ui.trip;if(!t)return;const tm=tripMiles(t),gas=tripGas(t);const a=document.getElementById("tp-tm"),b=document.getElementById("tp-gas"),c=document.getElementById("tp-irs");if(a)a.textContent=fmtMi(tm);if(b)b.textContent=money(gas);if(c)c.textContent=money(tm*mileRate(t.date));}
+async function tripFind(){const t=ui.trip;if(!t)return;const set=m=>{ui.tpStatus=m;const e=document.getElementById("tp-status");if(e)e.textContent=m;};
+  if(!t.to){toast("Type where you're going first.");return;}
+  set("Looking up the route…");
+  try{const to=await geocode(t.to);if(!to){set("Couldn't find that place. Try adding the city and state, or type the miles.");return;}
+    t.state=to.state;t.zip=to.zip;
+    if(t.from){const fr=await geocode(t.from);if(fr){const r=await roadMiles(fr,to);t.miles=r.miles;set(`${fmtMi(r.miles)} miles each way, about ${r.mins} minutes.`);}else set("Couldn't find the starting address. Type the miles.");}
+    else set("Add a starting address to get the miles.");}
+  catch(e){set("No connection for the route right now. Type the miles yourself.");}
+  const v=S.settings.vehicles.find(x=>x.id===t.vehicleId)||{};const g=await gasPriceFor(t.state,v.fuel);
+  if(g){t.gasPrice=g.price;t.priceSrc=g.src;}
+  const keepScroll=overlay.querySelector(".pbody");const sc=keepScroll?keepScroll.scrollTop:0;renderSheet();const nb=overlay.querySelector(".pbody");if(nb)nb.scrollTop=sc;}
+/* views */
+function monthKey(d){return d.slice(0,7);}
+function monthName(k){const [y,m]=k.split("-").map(Number);return new Date(y,m-1,1).toLocaleDateString("en-US",{month:"long",year:"numeric"});}
+function sumTrips(list){const biz=list.filter(t=>t.purpose!=="Personal");return{trips:list.length,miles:list.reduce((a,t)=>a+tripMiles(t),0),biz:biz.reduce((a,t)=>a+tripMiles(t),0),gas:list.reduce((a,t)=>a+tripGas(t),0),irs:biz.reduce((a,t)=>a+tripMiles(t)*mileRate(t.date),0)};}
+function viewMileage(){
+  const mk=ui.mileMonth||monthKey(today()),yr=mk.slice(0,4);const trips=S.trips||[];
+  const inMonth=trips.filter(t=>monthKey(t.date)===mk).sort((a,b)=>b.date.localeCompare(a.date)),inYear=trips.filter(t=>t.date.slice(0,4)===yr);
+  const m=sumTrips(inMonth),y=sumTrips(inYear);const seg=ui.mileSeg||"month";
+  let h=backMore()+`<h2 class="sub-h" style="font-size:1.4rem">Mileage and gas</h2>`;
+  h+=`<button class="btn pri wide" data-act="tpnew" style="min-height:3.75rem;font-size:1.15rem">+ Log a trip / figure gas cost</button>`;
+  h+=`<div class="seg" style="grid-template-columns:1fr 1fr"><button data-act="mileseg" data-v="month" aria-pressed="${seg==="month"}">Monthly</button><button data-act="mileseg" data-v="year" aria-pressed="${seg==="year"}">Yearly</button></div>`;
+  if(seg==="month"){
+    const prev=(()=>{const [a,b]=mk.split("-").map(Number);const d=new Date(a,b-2,1);return`${d.getFullYear()}-${p2(d.getMonth()+1)}`;})(),next=(()=>{const [a,b]=mk.split("-").map(Number);const d=new Date(a,b,1);return`${d.getFullYear()}-${p2(d.getMonth()+1)}`;})();
+    h+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem"><button class="iconbtn" data-act="milemonth" data-v="${prev}" aria-label="Previous month" style="font-size:1.5rem">‹</button><b style="font-size:1.2rem">${esc(monthName(mk))}</b><button class="iconbtn" data-act="milemonth" data-v="${next}" aria-label="Next month" style="font-size:1.5rem"${next>monthKey(today())?" disabled":""}>›</button></div>`;
+    h+=mileTiles(m);
+    h+=`<section class="sec"><h2><span>Trips</span><span>${inMonth.length}</span></h2><div class="list">${inMonth.map(t=>`<button class="est" data-act="tpopen" data-id="${t.id}"><span style="flex:1;min-width:0"><b style="display:block">${esc(t.to||"Trip")}</b><small class="muted">${esc(fmtDate(t.date))} · ${esc(t.purpose)}${t.custName?" · "+esc(t.custName):""}${t.round?" · round trip":""}</small></span><span style="text-align:right"><b style="display:block;font-variant-numeric:tabular-nums">${fmtMi(tripMiles(t))} mi</b><small class="muted">${tripGas(t)?money(tripGas(t))+" gas":""}</small></span></button>`).join("")||`<div class="empty">No trips logged this month.</div>`}</div></section>`;
+    if(inMonth.length)h+=`<button class="btn wide" data-act="mileexp" data-v="${mk}">Save this month's log (spreadsheet)</button>`;
+  }else{
+    h+=`<div style="display:flex;align-items:center;justify-content:space-between;gap:.5rem"><button class="iconbtn" data-act="milemonth" data-v="${+yr-1}-12" aria-label="Previous year" style="font-size:1.5rem">‹</button><b style="font-size:1.2rem">${yr}</b><button class="iconbtn" data-act="milemonth" data-v="${+yr+1}-01" aria-label="Next year" style="font-size:1.5rem"${+yr+1>+today().slice(0,4)?" disabled":""}>›</button></div>`;
+    h+=mileTiles(y);
+    h+=yearIRSCard(yr);
+    h+=`<div class="prev"><table><tr><th>Month</th><th style="text-align:right">Miles</th><th style="text-align:right">Gas</th><th style="text-align:right">IRS value</th></tr>${Array.from({length:12},(_,i)=>{const k=`${yr}-${p2(i+1)}`;const s=sumTrips(trips.filter(t=>monthKey(t.date)===k));return s.trips?`<tr data-act="milemonthgo" data-v="${k}" style="cursor:pointer"><td>${new Date(+yr,i,1).toLocaleDateString("en-US",{month:"short"})}</td><td style="text-align:right">${fmtMi(s.miles)}</td><td style="text-align:right">${money(s.gas)}</td><td style="text-align:right">${money(s.irs)}</td></tr>`:"";}).join("")}<tr style="font-weight:700"><td>Total</td><td style="text-align:right">${fmtMi(y.miles)}</td><td style="text-align:right">${money(y.gas)}</td><td style="text-align:right">${money(y.irs)}</td></tr></table></div>`;
+    if(inYear.length)h+=`<button class="btn wide" data-act="mileexp" data-v="${yr}">Save the ${yr} log for taxes (spreadsheet)</button>`;
+  }
+  h+=`<details class="more"><summary>Mileage settings</summary><div class="inner">
+  <label class="f">Your starting address (shop or home)<input type="text" id="ms-home" data-sfield="homeBase" value="${esc(S.settings.homeBase||"")}" placeholder="Street, city, state"></label>
+  <section class="sec"><h2><span>Vehicles</span></h2><div class="list">${S.settings.vehicles.map(v=>`<div class="prow" style="grid-template-columns:1fr 5rem var(--tap)"><input type="text" data-veh="${v.id}:name" id="vn-${v.id}" value="${esc(v.name)}" aria-label="Vehicle name"><input type="text" inputmode="decimal" data-veh="${v.id}:mpg" id="vm-${v.id}" value="${+v.mpg||""}" placeholder="mpg" aria-label="Miles per gallon"><button class="del" data-act="vehdel" data-id="${v.id}" aria-label="Remove ${esc(v.name)}">${ICON.trash}</button><div class="sub">Fuel <select data-veh="${v.id}:fuel" id="vf-${v.id}"><option value="regular"${v.fuel!=="diesel"?" selected":""}>Gas</option><option value="diesel"${v.fuel==="diesel"?" selected":""}>Diesel</option></select></div></div>`).join("")}<div class="addpart"><button class="btn add" data-act="vehadd">+ Add a vehicle</button></div></div></section>
+  <label class="f">Local gas price key (free, optional)<input type="text" id="ms-eia" data-sfield="eiaKey" value="${esc(S.settings.eiaKey||"")}" placeholder="Paste your key here" autocapitalize="off"></label>
+  <p class="hint">Without a key the app uses today's U.S. average. With a free key from the U.S. Energy Information Administration it uses the weekly average for the state or region you're driving to. Get one in a minute at <a href="https://www.eia.gov/opendata/register.php" target="_blank" rel="noopener">eia.gov/opendata/register.php</a>.</p>
+  <p class="hint">IRS business rate: ${MILE_RATES_DEFAULT.map(r=>`${(r.rate*100).toFixed(1)}¢ from ${fmtDate(r.from)}`).join(", ")}. Personal trips aren't counted in the IRS value.</p></div></details>`;
+  return h;}
+function mileTiles(s){return`<div class="ptot" style="border:1px solid var(--line);border-radius:var(--r);grid-template-columns:1fr 1fr"><span><small>Miles driven</small><b>${fmtMi(s.miles)}</b></span><span><small>Gas cost</small><b>${money(s.gas)}</b></span><span><small>Trips</small><b>${s.trips}</b></span><span><small>IRS mileage value</small><b>${money(s.irs)}</b></span></div>`;}
+async function mileExport(k){const list=(S.trips||[]).filter(t=>t.date.startsWith(k)).sort((a,b)=>a.date.localeCompare(b.date));if(!list.length){toast("No trips to save.");return;}
+  const rows=[["Date","From","To","Purpose","Customer / job","Miles one way","Round trip","Total miles","Vehicle","MPG","Gas price","Gas cost","IRS rate","IRS value","Note"]];
+  list.forEach(t=>{const v=S.settings.vehicles.find(x=>x.id===t.vehicleId)||{};const biz=t.purpose!=="Personal";rows.push([usDate(t.date),t.from,t.to,t.purpose,t.custName||"",t.miles,t.round?"Yes":"No",tripMiles(t),v.name||"",+t.mpg||+v.mpg||"",t.gasPrice?(+t.gasPrice).toFixed(2):"",tripGas(t).toFixed(2),biz?mileRate(t.date).toFixed(3):"0",biz?(tripMiles(t)*mileRate(t.date)).toFixed(2):"0.00",t.note||""]);});
+  const s=sumTrips(list);rows.push([]);rows.push(["Totals","","","","","","",fmtMi(s.miles),"","","",s.gas.toFixed(2),"",s.irs.toFixed(2),`Business miles: ${fmtMi(s.biz)}`]);
+  await shareFile(new TextEncoder().encode(csv(rows)),`mileage-log-${k}.csv`,"text/csv","","Mileage log ready");}
+function mileClick(a,el){
+  switch(a){
+    case"milehub":ui.view="mileage";main.scrollTop=0;render();return true;
+    case"mileyeargo":ui.view="mileage";ui.mileSeg="year";ui.mileMonth=el.dataset.v+"-12";main.scrollTop=0;render();return true;
+    case"mileirs":shareFile(buildMileagePDF(el.dataset.v),`mileage-log-${el.dataset.v}-IRS.pdf`,"application/pdf",`${S.settings.company||""} mileage log ${el.dataset.v}`,"IRS mileage log ready");return true;
+    case"mileseg":ui.mileSeg=el.dataset.v;render();return true;
+    case"milemonth":ui.mileMonth=el.dataset.v;render();return true;
+    case"milemonthgo":ui.mileMonth=el.dataset.v;ui.mileSeg="month";render();return true;
+    case"mileexp":mileExport(el.dataset.v);return true;
+    case"tpnew":{const j=el.dataset.job&&getJob(el.dataset.job);const x=j&&j.custId&&getSite(j.custId);ui.trip=newTrip(j?{to:j.site||(x&&x.address)||"",jobId:j.id,custName:j.custName,purpose:"Job"}:{});ui.tripEdit=false;ui.tpStatus=S.settings.homeBase?"":"Tip: add your starting address in Mileage settings so it's filled in each time.";ui.sheet="trip";renderSheet();if(ui.trip.to&&ui.trip.from)tripFind();return true;}
+    case"tpopen":{const t=(S.trips||[]).find(x=>x.id===el.dataset.id);if(!t)return true;ui.trip=clone(t);ui.tripEdit=true;ui.tpStatus="";ui.sheet="trip";renderSheet();return true;}
+    case"tpfind":tripFind();return true;
+    case"tpmyloc":if(!navigator.geolocation){toast("This phone can't share its location here.");return true;}ui.tpStatus="Finding where you are…";renderSheet();navigator.geolocation.getCurrentPosition(async p=>{try{const r=await reverseGeo(p.coords.latitude,p.coords.longitude);ui.trip.from=r.text;ui.tpStatus="Starting from your current location.";}catch(e){ui.tpStatus="Couldn't look up your location. Type the address.";}renderSheet();},()=>{ui.tpStatus="Location wasn't allowed. Type the address instead.";renderSheet();},{timeout:10000,maximumAge:60000});return true;
+    case"tpsave":{const t=ui.trip;if(!t)return true;if(!(+t.miles>0)){toast("Add the miles first, or tap Find the miles.");return true;}
+      const j=t.jobId&&getJob(t.jobId);if(j&&!t.custName)t.custName=j.custName;S.trips=S.trips||[];const i=S.trips.findIndex(x=>x.id===t.id);const rec=clone(t);if(i>=0)S.trips[i]=rec;else S.trips.unshift(rec);touchOp("trips",rec);
+      ui.sheet=null;ui.trip=null;ui.mileMonth=monthKey(rec.date);if(ui.view!=="jobs")ui.view="mileage";render();toast(`Saved: ${fmtMi(tripMiles(rec))} miles${tripGas(rec)?", "+money(tripGas(rec))+" in gas":""}`);return true;}
+    case"tpdel":{const t=ui.trip;if(!t)return true;if(ui.armed!=="trip:"+t.id){askConfirm("trip:"+t.id,el);return true;}ui.armed=null;delOp("trips",t.id);ui.sheet=null;ui.trip=null;render();return true;}
+    case"vehadd":S.settings.vehicles.push({id:uid(),name:"Vehicle",mpg:20,fuel:"regular"});touchSettings();render();return true;
+    case"vehdel":if(S.settings.vehicles.length<2){toast("Keep at least one vehicle.");return true;}S.settings.vehicles=S.settings.vehicles.filter(v=>v.id!==el.dataset.id);touchSettings();render();return true;
+  }
+  return false;}
+/* ---------- Automatic trip logging and the IRS mileage log ---------- */
+async function autoLogJobTrip(j){const st=S.settings;if(st.autoMiles===false)return;const x=j.custId&&getSite(j.custId);const to=j.site||(x&&x.address)||"";
+  if(!st.homeBase||!to)return;S.trips=S.trips||[];if(S.trips.some(t=>t.jobId===j.id))return;
+  const v=st.vehicles[0]||{};const t=newTrip({date:j.doneDate||today(),from:st.homeBase,to,round:true,purpose:j.kind==="Delivery"?"Delivery":"Job",jobId:j.id,custName:j.custName,vehicleId:v.id,auto:true,note:`Job #${j.no}`});
+  S.trips.unshift(t);touchOp("trips",t);
+  try{const a=await geocode(t.from),b=await geocode(t.to);if(a&&b){const r=await roadMiles(a,b);t.miles=r.miles;t.state=b.state;t.zip=b.zip;}const g=await gasPriceFor(t.state,v.fuel);if(g){t.gasPrice=g.price;t.priceSrc=g.src;}touchOp("trips",t);
+    if(+t.miles)toast(`Mileage logged: ${fmtMi(tripMiles(t))} miles to ${j.custName||"the job"}`);}
+  catch(e){touchOp("trips",t);}
+  if(!gate.locked)render();}
+function mileReminders(t){const out=[];const trips=S.trips||[];
+  trips.filter(x=>!(+x.miles>0)).slice(0,5).forEach(x=>out.push({key:"trip:"+x.id,kind:"watch",mile:x.id,title:`Add the miles for your trip to ${x.custName||x.to||"a job"}`,sub:`${fmtDate(x.date)} · couldn't look up the route then`,date:addDays(t,1),cal:{title:"Add missing trip miles",date:addDays(t,1),details:x.to||""}}));
+  const m=+t.slice(5,7),y=+t.slice(0,4);const yr=m===1?y-1:(m===12&&+t.slice(8,10)>=15?y:null);
+  if(yr&&trips.some(x=>x.date.startsWith(String(yr))))out.push({key:"mileyear:"+yr,kind:"watch",mileYear:yr,title:`Your ${yr} mileage log is ready for taxes`,sub:"Open it and save the IRS mileage log PDF for your tax preparer",date:addDays(t,1),cal:{title:`Get ${yr} mileage log for taxes`,date:addDays(t,1),details:"Mileage and gas, Yearly, IRS mileage log"}});
+  return out;}
+function yearSummary(yr){const list=(S.trips||[]).filter(t=>t.date.startsWith(String(yr)));const s=sumTrips(list);const personal=list.filter(t=>t.purpose==="Personal").reduce((a,t)=>a+tripMiles(t),0);
+  const odo=((S.settings.odo||{})[yr])||{};let odoTotal=0;S.settings.vehicles.forEach(v=>{const o=odo[v.id]||{};if(+o.end>+o.start)odoTotal+=(+o.end)-(+o.start);});
+  const rates=[...new Set(list.filter(t=>t.purpose!=="Personal").sort((a,b)=>a.date.localeCompare(b.date)).map(t=>mileRate(t.date)))];
+  return Object.assign(s,{list,personal,odoTotal,bizPct:odoTotal?Math.round(s.biz/odoTotal*1000)/10:null,rates});}
+function buildMileagePDF(yr){
+  const st=S.settings,Y=yearSummary(yr),W=612,H=792,M=40,ACC="#1f5fbf",INK="#0f2233",MUT="#5a6773",LINE="#d6dde5",BAND="#eef2f7";
+  const objs=[];const add=o=>{objs.push(o);return objs.length;};const pe=t=>t.replace(/\\/g,"\\\\").replace(/\(/g,"\\(").replace(/\)/g,"\\)");
+  const fR=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>"),fB=add("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+  const pages=[];let cur,y;const P=s=>cur.push(s);
+  const text=(x,yy,str,size,bold,color,align)=>{str=pdfSafe(str);if(!str)return;let xx=x;const w=tw(str,size,bold);if(align==="right")xx=x-w;else if(align==="center")xx=x-w/2;P(`BT /${bold?"F2":"F1"} ${size} Tf ${rgb(color||INK)} rg ${xx.toFixed(2)} ${(H-yy).toFixed(2)} Td (${pe(str)}) Tj ET`);};
+  const rect=(x,yy,w,h,c)=>P(`${rgb(c)} rg ${x.toFixed(2)} ${(H-yy-h).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`);
+  const line=(x1,y1,x2,y2)=>P(`${rgb(LINE)} RG 0.5 w ${x1} ${(H-y1).toFixed(2)} m ${x2} ${(H-y2).toFixed(2)} l S`);
+  const C={date:M+4,to:M+62,purp:M+300,mi:W-M-90,val:W-M-4};
+  const head=()=>{rect(M,y,W-2*M,20,BAND);[["DATE",C.date],["DESTINATION (FROM -> TO)",C.to],["BUSINESS PURPOSE",C.purp]].forEach(([t,x])=>text(x,y+13.5,t,7.5,true,MUT));text(C.mi,y+13.5,"MILES",7.5,true,MUT,"right");text(C.val,y+13.5,"IRS VALUE",7.5,true,MUT,"right");y+=26;};
+  const newPage=first=>{cur=[];pages.push(cur);y=M;if(!first){text(M,y+10,`${st.company||""} - Mileage log ${yr} (continued)`,9,true,MUT);y+=22;head();}};
+  newPage(true);
+  text(M,y+16,st.company||"Mileage log",16,true,INK);text(W-M,y+16,`MILEAGE LOG ${yr}`,14,true,ACC,"right");y+=30;
+  [st.address,st.phone].filter(Boolean).forEach(v=>{text(M,y,v,9,false,MUT);y+=12;});
+  text(M,y,`Vehicle${st.vehicles.length>1?"s":""}: ${st.vehicles.map(v=>v.name).join(", ")}`,9,false,MUT);y+=12;
+  text(M,y,`Prepared ${fmtDate(today())}. Trips were recorded in the app at the time of travel.`,9,false,MUT);y+=18;
+  const box=[["Business miles",fmtMi(Y.biz)],["IRS mileage value",money(Y.irs)],["Gas spent",money(Y.gas)],["Trips",String(Y.trips)]];
+  const bw=(W-2*M-18)/4;box.forEach(([k,v],i)=>{const bx=M+i*(bw+6);rect(bx,y,bw,46,BAND);text(bx+8,y+15,k.toUpperCase(),7.5,true,MUT);text(bx+8,y+36,v,15,true,INK);});y+=58;
+  const lines=[`Standard mileage rate used: ${Y.rates.length?Y.rates.map(r=>(r*100).toFixed(1)+" cents/mile").join(", then "):"-"}${Y.rates.length>1?" (the IRS raised the rate during the year; each trip uses the rate for its date)":""}.`,
+    Y.personal?`Personal miles logged (not counted): ${fmtMi(Y.personal)}.`:"",
+    Y.odoTotal?`Odometer: ${fmtMi(Y.odoTotal)} total miles driven in ${yr}; business use ${Y.bizPct}%.`:"Add January 1 and December 31 odometer readings in the app to show total miles and business-use percent."].filter(Boolean);
+  lines.forEach(l=>wrapText(l,9,false,W-2*M).forEach(w=>{text(M,y,w,9,false,INK);y+=12;}));y+=8;
+  head();
+  const list=Y.list.slice().sort((a,b)=>a.date.localeCompare(b.date));let curMonth="";
+  list.forEach(t=>{const mk=t.date.slice(0,7);if(mk!==curMonth){curMonth=mk;if(y+40>H-M-30)newPage(false);const ms=sumTrips(list.filter(z=>z.date.startsWith(mk)));text(C.date,y+10,monthName(mk).toUpperCase(),8.5,true,ACC);text(C.mi,y+10,fmtMi(ms.biz)+" business",8,false,MUT,"right");y+=18;}
+    const dest=wrapText(`${t.from?t.from+" -> ":""}${t.to}${t.round?" (round trip)":""}`,8.5,false,C.purp-C.to-8);const purp=wrapText(`${t.purpose}${t.custName?": "+t.custName:""}${t.note&&t.note!==t.custName?" - "+t.note:""}`,8.5,false,C.mi-C.purp-40);
+    const n=Math.max(dest.length,purp.length);const h=11*n+6;if(y+h>H-M-30)newPage(false);const biz=t.purpose!=="Personal";
+    text(C.date,y+9,fmtDate(t.date).replace(/, \d{4}$/,""),8.5,false,INK);dest.forEach((l,i)=>text(C.to,y+9+i*11,l,8.5,false,INK));purp.forEach((l,i)=>text(C.purp,y+9+i*11,l,8.5,false,biz?INK:MUT));
+    text(C.mi,y+9,fmtMi(tripMiles(t)),8.5,true,INK,"right");text(C.val,y+9,biz?money(tripMiles(t)*mileRate(t.date)):"personal",8.5,false,biz?INK:MUT,"right");y+=h;line(M+2,y-2,W-M-2,y-2);});
+  if(y+60>H-M-30)newPage(false);y+=10;rect(C.mi-120,y,W-M-(C.mi-120),36,ACC);text(C.mi-110,y+15,"TOTAL BUSINESS MILES",8,true,"#ffffff");text(C.mi-110,y+29,fmtMi(Y.biz),12,true,"#ffffff");text(C.val-6,y+15,"IRS VALUE",8,true,"#ffffff","right");text(C.val-6,y+29,money(Y.irs),12,true,"#ffffff","right");y+=50;
+  wrapText("Keep this log with your tax records. Your tax preparer will use the business miles on Schedule C (Part IV) or Form 4562. This summary is not tax advice.",8,false,W-2*M).forEach(l=>{text(M,y,l,8,false,MUT);y+=11;});
+  pages.forEach((pg,i)=>{cur=pg;text(W/2,H-22,`${st.company||""} - Mileage log ${yr}`,8,false,MUT,"center");text(W-M,H-22,`Page ${i+1} of ${pages.length}`,8,false,MUT,"right");});
+  const pagesId=objs.length+pages.length*2+1;const kids=[];
+  pages.forEach(pg=>{const cid=add({dict:"",stream:pg.join("\n")});kids.push(add(`<< /Type /Page /Parent ${pagesId} 0 R /MediaBox [0 0 ${W} ${H}] /Resources << /Font << /F1 ${fR} 0 R /F2 ${fB} 0 R >> >> /Contents ${cid} 0 R >>`));});
+  const pid=add(`<< /Type /Pages /Kids [${kids.map(k=>k+" 0 R").join(" ")}] /Count ${kids.length} >>`);const cat=add(`<< /Type /Catalog /Pages ${pid} 0 R >>`);
+  let out="%PDF-1.4\n%\xE2\xE3\xCF\xD3\n";const offs=[];objs.forEach((o,i)=>{offs.push(out.length);if(typeof o==="string")out+=`${i+1} 0 obj\n${o}\nendobj\n`;else out+=`${i+1} 0 obj\n<< ${o.dict} /Length ${o.stream.length} >>\nstream\n${o.stream}\nendstream\nendobj\n`;});
+  const xr=out.length;out+=`xref\n0 ${objs.length+1}\n0000000000 65535 f \n`+offs.map(o=>String(o).padStart(10,"0")+" 00000 n \n").join("")+`trailer\n<< /Size ${objs.length+1} /Root ${cat} 0 R >>\nstartxref\n${xr}\n%%EOF`;
+  const b=new Uint8Array(out.length);for(let i=0;i<out.length;i++)b[i]=out.charCodeAt(i)&255;return b;}
+function yearIRSCard(yr){const Y=yearSummary(yr);const odo=((S.settings.odo||{})[yr])||{};
+  return`<div class="card stack" style="border:3px solid var(--accent)"><h2 class="sub-h">${yr} for taxes</h2>
+  <div class="ptot" style="grid-template-columns:1fr 1fr;border-radius:12px"><span><small>Business miles</small><b>${fmtMi(Y.biz)}</b></span><span><small>IRS mileage value</small><b>${money(Y.irs)}</b></span><span><small>Personal miles</small><b>${fmtMi(Y.personal)}</b></span><span><small>Business use</small><b>${Y.bizPct!==null?Y.bizPct+"%":"-"}</b></span></div>
+  <p class="hint">Odometer readings show your total miles for the year. The IRS asks for them.</p>
+  ${S.settings.vehicles.map(v=>{const o=odo[v.id]||{};return`<div class="row2"><label class="f" style="font-weight:400">${esc(v.name)}: Jan 1 odometer<input type="text" inputmode="numeric" data-odo="${yr}:${v.id}:start" id="od-${yr}-${v.id}-s" value="${esc(o.start||"")}"></label><label class="f" style="font-weight:400">Dec 31 odometer<input type="text" inputmode="numeric" data-odo="${yr}:${v.id}:end" id="od-${yr}-${v.id}-e" value="${esc(o.end||"")}"></label></div>`;}).join("")}
+  <button class="btn pri wide" data-act="mileirs" data-v="${yr}" style="min-height:3.5rem"${Y.trips?"":" disabled"}>Save the IRS mileage log (PDF)</button>
+  <label class="chk"><input type="checkbox" data-automiles="1" ${S.settings.autoMiles!==false?"checked":""}><span>Log mileage by itself when I finish a job (from my starting address to the customer and back)</span></label></div>`;}
+
 /* ---------- toast ---------- */
 let toastT;function toast(t){let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}el.textContent=t;clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),3200);}
 
@@ -1795,7 +1985,7 @@ function pickNewCat(){const n=(window.__newCat||"").trim();return n;}
 document.addEventListener("click",async e=>{
   const el=e.target.closest("[data-act]");if(!el)return;const a=el.dataset.act;
   if(a==="closebg"&&e.target!==el)return;
-  if(!["delest","delitem","resetprices","newest","pmdellog","pmdelmachine","pmdelsite","pmdelpart","confirmyes","jobdel","invdel","tipdel","photodel","paydel","cfexit"].includes(a))ui.armed=null;
+  if(!["delest","delitem","resetprices","newest","pmdellog","pmdelmachine","pmdelsite","pmdelpart","confirmyes","jobdel","invdel","tipdel","photodel","paydel","cfexit","tpdel"].includes(a))ui.armed=null;
   switch(a){
     case"view":{const nv=el.dataset.v;if(nv==="jobs"){ui.jobId=null;ui.invId=null;}if(nv==="pm"&&ui.view==="pm"){ui.pmSite=null;ui.pmMachine=null;}ui.view=nv;ui.armed=null;main.scrollTop=0;render();break;}
     case"svc":ui.svc=el.dataset.v;render();break;
@@ -1886,6 +2076,10 @@ function openNewCat(sel,done){
 document.addEventListener("input",e=>{
   const t=e.target;
   if(t.id==="pm-search"){ui.pmq=t.value;const pos=t.selectionStart;render();const s2=document.getElementById("pm-search");s2.focus();try{s2.setSelectionRange(pos,pos);}catch(_){}return;}
+  if(t.dataset.tp&&ui.trip){const f=t.dataset.tp;let v=t.value;if(f==="miles"||f==="gasPrice")v=Math.max(0,numOf(v)||0);if(f==="round")v=v==="1";if(f==="jobId"){v=v||null;const j=v&&getJob(v);ui.trip.custName=j?j.custName:"";}ui.trip[f]=v;tripFormRefresh();return;}
+  if(t.dataset.veh){const [id,f]=t.dataset.veh.split(":");const v=S.settings.vehicles.find(x=>x.id===id);if(v){v[f]=f==="mpg"?Math.max(0,numOf(t.value)||0):t.value;touchSettings();}return;}
+  if(t.dataset.odo){const [yr,id,f]=t.dataset.odo.split(":");const o=S.settings.odo=S.settings.odo||{};o[yr]=o[yr]||{};o[yr][id]=o[yr][id]||{};o[yr][id][f]=numOf(t.value)||"";touchSettings();return;}
+  if(t.dataset.automiles){S.settings.autoMiles=t.checked;touchSettings();return;}
   if(t.dataset.cf&&ui.cf){ui.cf[t.dataset.cf]=t.value;return;}
   if(t.dataset.cfdate&&ui.cf){ui.cf.dates[+t.dataset.cfdate]=t.value;return;}
   if(t.dataset.cfok&&ui.cf){ui.cf.ok=t.checked;return;}
@@ -1913,10 +2107,10 @@ document.addEventListener("toggle",e=>{if(e.target&&e.target.id==="more")ui.more
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&ui.owner){ui.owner=false;render();}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&ui.sheet==="pin"){e.preventDefault();document.querySelector('[data-act=pincheck]').click();return;}if(e.key==="Escape"&&ui.sheet){ui.sheet=null;ui.imp=null;ui.pmimp=null;ui.copyText=null;renderSheet();}});
 
-window.__app={gate,gateRec,pinHash,buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
+window.__app={buildMileagePDF,yearSummary,tripMiles,tripGas,mileRate,gate,gateRec,pinHash,buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
 const HOSTED=/^https?:$/.test(location.protocol)&&!/claude|anthropic/i.test(location.hostname);
 if(HOSTED&&!S.settings.appUrl){S.settings.appUrl=location.origin+location.pathname.replace(/index\.html$/,"");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-if(HOSTED&&"serviceWorker" in navigator){const regSW=()=>navigator.serviceWorker.register("sw.js").catch(()=>{});if(document.readyState==="complete")regSW();else window.addEventListener("load",regSW);setTimeout(regSW,4000);}
+if(HOSTED&&"serviceWorker" in navigator){const regSW=()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update().catch(()=>{});});}).catch(()=>{});if(document.readyState==="complete")regSW();else window.addEventListener("load",regSW);setTimeout(regSW,4000);}
 let PUBLIC=false;
 try{const hsh=location.hash||"";
   if(hsh.startsWith("#form=")){ui.pubCfg=b64d(hsh.slice(6));ui.mode="public";ui.cf=newCF();PUBLIC=true;}
