@@ -258,7 +258,7 @@ textarea.copy{min-height:12rem;font-family:ui-monospace,Menlo,monospace;font-siz
 </head>
 <body>
 <div class="app">
-  <header class="top"><div style="min-width:0"><h1 id="title">Estimates</h1><div class="sync" id="sync" style="text-align:left">Saved on this phone</div></div><button id="ownerbtn" class="lock" data-act="owner" aria-label="Show my costs"></button></header>
+  <header class="top"><div style="min-width:0"><h1 id="title">Estimates</h1><div class="sync" id="sync" data-act="spaces" role="button" tabindex="0" style="text-align:left;cursor:pointer">Saved on this phone</div></div><button id="ownerbtn" class="lock" data-act="owner" aria-label="Show my costs"></button></header>
   <main id="main"></main>
   <div id="barwrap"></div>
   <nav class="tabs" id="tabs" aria-label="Main">
@@ -336,7 +336,7 @@ function touchDraft(){S.draft.u=Date.now();dirty.draft=true;persist();}
 
 /* ---------- cloud sync (per-person, private) ---------- */
 let DB=null,BASE=null,chain=Promise.resolve();
-function setSync(t){document.getElementById("sync").textContent=t;}
+function setSync(t){if(typeof cloud!=="undefined"&&cloud.user&&DB===fbDB&&cloud.ws&&/^(Synced to your account|Saved on this phone, will sync later)$/.test(t))t=spaceName(cloud.ws)+(t[0]==="S"&&t[1]==="y"?" · backed up ☁":" · saved on phone, will back up");document.getElementById("sync").textContent=t;}
 async function connect(tries){
   if(!window.claude||typeof window.claude.use!=="function"){if(tries<10)setTimeout(()=>connect(tries+1),500);return;}
   try{
@@ -356,7 +356,7 @@ async function pull(){
   const s=await DB.doc(BASE+"/settings").get();
   if(s.exists){const r=s.data();if(r.settings&&(r.u||0)>(S.settings.u||0)){S.settings=clone(r.settings);}else if((S.settings.u||0)>(r.u||0))dirty.settings=true;}
   else if(S.settings.u)dirty.settings=true;
-  const d=await DB.doc(BASE+"/draft").get();
+  const d=await DB.doc(draftPath()).get();
   if(d.exists){const r=d.data();if(r.draft&&(r.u||0)>(S.draft.u||0))S.draft=clone(r.draft);else dirty.draft=true;}else dirty.draft=true;
   const q=await estCol().get();
   const byId=new Map(S.estimates.map(e=>[e.id,e]));
@@ -371,19 +371,20 @@ async function pull(){
   S.pm.sites=[...sb.values()];
   await pullOps();
   try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
-  render(); flush();
+  mirrorSave();softRender(); flush();
 }
 function flush(){
   if(!DB)return;
   chain=chain.then(async()=>{
     if(dirty.settings){dirty.settings=false;await DB.doc(BASE+"/settings").set({u:S.settings.u||Date.now(),settings:S.settings});}
-    if(dirty.draft){dirty.draft=false;await DB.doc(BASE+"/draft").set({u:S.draft.u||Date.now(),draft:S.draft});}
+    if(dirty.draft){dirty.draft=false;await DB.doc(draftPath()).set({u:S.draft.u||Date.now(),draft:S.draft});}
     for(const id of [...dirty.est]){dirty.est.delete(id);const e=S.estimates.find(x=>x.id===id);if(e)await estCol().doc(id).set({u:e.u||Date.now(),est:e});}
     for(const id of [...dirty.del]){await estCol().doc(id).delete();dirty.del.delete(id);}
     for(const id of [...dirty.sites]){dirty.sites.delete(id);const x=S.pm.sites.find(y=>y.id===id);if(x)await siteCol().doc(id).set({u:x.u||Date.now(),site:x});}
     for(const id of [...dirty.sdel]){await siteCol().doc(id).delete();dirty.sdel.delete(id);}
     S.pm.deleted=[...dirty.sdel];
     await flushOps();
+    await flushPhotos();
     S.deleted=[...dirty.del];try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
     setSync("Synced to your account");
   }).catch(err=>{
@@ -525,6 +526,7 @@ function viewPrices(){
   <button class="btn wide" data-act="gatelock">Lock the app now</button>
   <details class="more" style="border:0"><summary style="padding:.4rem 0;font-size:1rem">Change the app PIN</summary><div class="inner" style="padding:0">
   <label class="f">Current PIN<input type="password" inputmode="numeric" id="g-cur" autocomplete="off"></label><label class="f">New PIN (4 to 10 numbers)<input type="password" inputmode="numeric" id="g-new" autocomplete="off"></label><label class="f">New PIN again<input type="password" inputmode="numeric" id="g-new2" autocomplete="off"></label><button class="btn pri" data-act="gatechange">Change PIN</button><p class="hint">This changes the PIN on this phone only.</p></div></details></div>`;
+  h+=cloudSettingsCard();
   h+=backupCard();
   h+=`<button class="btn danger" data-act="resetprices">Reset to the sample price list</button>`;
   return h;
@@ -549,6 +551,7 @@ function renderSheet(){
   else if(ui.sheet==="import"){title="Import from Excel";body=importBody();}
   else if(ui.sheet==="backupcopy"){title="Your backup";body=`<p class="muted" style="margin:0">Press and hold the text, Select All, then Copy. Paste it into a note or an email to yourself.</p><textarea class="copy" id="copytext" readonly>${esc(backupText())}</textarea>`;}
   else if(ui.sheet==="paste"){title="Paste a backup";body=`<p class="muted" style="margin:0">Paste the backup text. Your price list is replaced with the one in the backup, and its saved estimates are added to yours.</p><textarea class="copy" id="pastetext" placeholder="Paste here"></textarea><button class="btn pri wide" data-act="restoretext">Restore</button>`;}
+  else if(ui.sheet==="spaces"){title="Cloud backup";body=spacesSheet();}
   overlay.innerHTML=`<div class="sheet" data-act="closebg"><div class="panel" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="phead"><h3>${esc(title)}</h3><button class="x" data-act="close" aria-label="Close">×</button></div><div class="pbody">${body}</div></div></div>`;
 }
 function jobSum(d,c){c=c||calc(d);const parts=d.custom.reduce((a,ci)=>a+(+ci.cost||0)*(+ci.qty||0),0);const other=+d.otherCost||0;const cost=parts+other;const net=c.total-c.tax;const keep=net-cost;return{pays:c.total,tax:c.tax,parts,other,cost,keep,pct:net>0?Math.round(keep/net*100):0};}
@@ -1202,9 +1205,11 @@ function mapsLink(a){return"https://www.google.com/maps/search/?api=1&query="+en
 /* photos: kept in IndexedDB so they don't fill up normal storage */
 const memPhotos=new Map();let pdbP=null;
 function pdb(){if(!pdbP)pdbP=new Promise((res,rej)=>{try{const r=indexedDB.open("rr-photos",1);r.onupgradeneeded=()=>r.result.createObjectStore("p");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});return pdbP;}
-async function photoPut(id,data){memPhotos.set(id,data);try{const db=await pdb();await new Promise((res,rej)=>{const t=db.transaction("p","readwrite");t.objectStore("p").put(data,id);t.oncomplete=res;t.onerror=()=>rej(t.error);});}catch(e){toast("Photo kept for now, but this phone may not save it after closing.");}}
-async function photoGet(id){if(memPhotos.has(id))return memPhotos.get(id);try{const db=await pdb();const v=await new Promise((res,rej)=>{const r=db.transaction("p").objectStore("p").get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});if(v)memPhotos.set(id,v);return v;}catch(e){return null;}}
-async function photoDel(id){memPhotos.delete(id);try{const db=await pdb();db.transaction("p","readwrite").objectStore("p").delete(id);}catch(e){}}
+async function photoPut(id,data){memPhotos.set(id,data);dPhotos.add(id);try{const db=await pdb();await new Promise((res,rej)=>{const t=db.transaction("p","readwrite");t.objectStore("p").put(data,id);t.oncomplete=res;t.onerror=()=>rej(t.error);});}catch(e){toast("Photo kept for now, but this phone may not save it after closing.");}}
+async function photoGet(id){if(memPhotos.has(id))return memPhotos.get(id);try{const db=await pdb();const v=await new Promise((res,rej)=>{const r=db.transaction("p").objectStore("p").get(id);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});if(v){memPhotos.set(id,v);return v;}}catch(e){}
+  if(DB&&DB===fbDB){try{const s=await DB.doc(BASE+"/profile/photos/"+id).get();if(s.exists){const d=s.data().data;memPhotos.set(id,d);try{const db=await pdb();db.transaction("p","readwrite").objectStore("p").put(d,id);}catch(e){}return d;}}catch(e){}}
+  return null;}
+async function photoDel(id){memPhotos.delete(id);dPhotos.delete(id);if(DB&&DB===fbDB)DB.doc(BASE+"/profile/photos/"+id).delete().catch(()=>{});try{const db=await pdb();db.transaction("p","readwrite").objectStore("p").delete(id);}catch(e){}}
 async function allPhotoIds(){const ids=[];S.jobs.forEach(j=>(j.photos||[]).forEach(p=>ids.push(p)));S.docs.forEach(d=>(d.photos||[]).forEach(p=>ids.push(p)));return ids;}
 function hydratePhotos(){document.querySelectorAll("img[data-photo]:not([src])").forEach(async img=>{const d=await photoGet(img.dataset.photo);if(d)img.src=d;else img.alt="Photo not on this phone";});}
 function resizeImage(file,max,q){return new Promise((res,rej)=>{const img=new Image();const url=URL.createObjectURL(file);img.onload=()=>{const sc=Math.min(1,max/Math.max(img.width,img.height));const cv=document.createElement("canvas");cv.width=Math.max(1,Math.round(img.width*sc));cv.height=Math.max(1,Math.round(img.height*sc));const cx=cv.getContext("2d");cx.fillStyle="#fff";cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(img,0,0,cv.width,cv.height);URL.revokeObjectURL(url);res({data:cv.toDataURL("image/jpeg",q),w:cv.width,h:cv.height});};img.onerror=()=>{URL.revokeObjectURL(url);rej(new Error("bad image"));};img.src=url;});}
@@ -1253,7 +1258,7 @@ function invRow(v){const t=invTotals(v),s=invStatus(v);return`<button class="est
 function reqCard(r){return`<div class="rem"><div class="rh" style="cursor:default"><span class="dot ${r.kind==="service"?"down":""}" aria-hidden="true"></span><span style="flex:1;min-width:0"><b style="display:block">${esc(REQN[r.kind]||"Request")}: ${esc(r.custName||"No name")}</b><small class="muted">${esc(r.note||"")}${r.phone?` · ${esc(r.phone)}`:""}${r.want?` · wants ${esc(fmtDate(r.want))}`:""}${r.source?` · ${esc(r.source)}`:""}</small>${r.details?`<button class="link" data-act="reqdetail" data-id="${r.id}" style="min-height:0;padding:.3rem 0 0">See their full form</button>`:""}</span></div>
   <div class="acts"><button class="btn pri" data-act="reqjob" data-id="${r.id}">Make a job</button><button class="btn" data-act="reqest" data-id="${r.id}">Estimate</button><button class="btn" data-act="reqclose" data-id="${r.id}">Close</button></div></div>`;}
 
-function backupNudge(){
+function backupNudge(){if(typeof cloud!=="undefined"&&cloud.user)return"";
   if(!hasData())return`<div class="card stack" style="border:3px solid var(--accent)"><h2 class="sub-h">New phone, or starting over?</h2><p class="hint">If you have a backup file from this app, load it here and everything comes back: prices, customers, jobs and invoices.</p><label class="btn pri filebtn wide">Load my backup file<input type="file" accept=".json,.txt,application/json,text/plain" data-act="restorefile" aria-label="Load a backup file"></label></div>`;
   const lb=S.lastBackup||0,days=lb?Math.floor((Date.now()-lb)/864e5):null;
   const due=!lb||((S.lastChange||0)>lb&&days>=7);
@@ -1263,6 +1268,7 @@ function backupNudge(){
 function viewHome(){
   genAgreementRequests();
   const t=today();let h=`<div><h2 class="sub-h" style="font-size:1.5rem">Today</h2><div class="muted" style="font-weight:700">${esc(weekday(t))}</div></div>`;
+  h+=cloudCard();
   h+=backupNudge();
   h+=`<div class="qgrid"><button class="qbtn" data-act="newreq"><span aria-hidden="true">${ICON.inbox}</span>New request</button><button class="qbtn" data-act="newjob"><span aria-hidden="true">${ICON.clip}</span>New job</button><button class="qbtn" data-act="view" data-v="estimate"><span aria-hidden="true">${ICON.calc}</span>New estimate</button><button class="qbtn" data-act="newcust"><span aria-hidden="true">${ICON.user}</span>New customer</button></div>
   <button class="formbtn" data-act="cfhub"><span class="mi" aria-hidden="true">${ICON.doc}</span><span style="flex:1">Customer request form<small class="muted" style="display:block;font-weight:400">Let a customer fill in their own request</small></span><span class="chev" aria-hidden="true">›</span></button>
@@ -1468,7 +1474,7 @@ async function opsClick(a,el){
     case"expinv":exportCSV("inv");break;
     case"exppay":exportCSV("pay");break;
     case"estjob":{const d=S.draft;ensureEstimateNo(d);saveDraftAsEstimate();const x=siteByName(d.customer);const nj=makeJob({custId:x?x.id:null,custName:d.customer,site:d.site||(x&&x.address)||"",kind:"Delivery",desc:`From estimate #${d.no}`,estId:d.id,items:linesFromEstimate(d).map(l=>({id:uid(),desc:l.desc,qty:l.qty,unit:l.unit,cost:l.cost}))});ui.sheet=null;openJob(nj.id);toast("Job made from the estimate. Pick a date.");break;}
-    default:if(!pimpClick(a,el)&&!mileClick(a,el))await cformClick(a,el);break;
+    default:if(!pimpClick(a,el)&&!mileClick(a,el)&&!(await cloudClick(a,el)))await cformClick(a,el);break;
     case"estinv":{const d=S.draft;ensureEstimateNo(d);saveDraftAsEstimate();const x=siteByName(d.customer);const nv=newInvoice({custId:x?x.id:null,custName:d.customer,site:d.site||"",lines:linesFromEstimate(d),discount:+d.discount||0,applyTax:!!d.tax,estId:d.id,notes:`Estimate #${d.no}`,otherCost:+d.otherCost||0});ui.sheet=null;ui.invId=nv.id;ui.jobId=null;ui.view="jobs";ui.jobsSeg="invoices";main.scrollTop=0;render();break;}
   }
 }
@@ -1976,6 +1982,130 @@ function yearIRSCard(yr){const Y=yearSummary(yr);const odo=((S.settings.odo||{})
   <button class="btn pri wide" data-act="mileirs" data-v="${yr}" style="min-height:3.5rem"${Y.trips?"":" disabled"}>Save the IRS mileage log (PDF)</button>
   <label class="chk"><input type="checkbox" data-automiles="1" ${S.settings.autoMiles!==false?"checked":""}><span>Log mileage by itself when I finish a job (from my starting address to the customer and back)</span></label></div>`;}
 
+/* ---------- Cloud backup: Google sign-in, personal and shared spaces ---------- */
+const FB_CONFIG={"apiKey": "AIzaSyDv9JI8rMIhvspHkRSIphKEQPtVwl4ZEmA", "authDomain": "rr-assembly-services.firebaseapp.com", "projectId": "rr-assembly-services", "storageBucket": "rr-assembly-services.firebasestorage.app", "messagingSenderId": "1095239064712", "appId": "1:1095239064712:web:b99235b6d03d87f86e533d"};
+const FB_VER="10.12.2";
+const CLOUD_KEY=KEY+".cloud";
+const cloud={on:false,user:null,spaces:[],ws:null,status:"",busy:false};
+let FBAUTH=null,FS=null,cloudTimer=null,lastPull=0;
+const dPhotos=new Set();
+function cloudLocal(){try{return JSON.parse(localStorage.getItem(CLOUD_KEY)||"{}");}catch(e){return{};}}
+function cloudLocalSet(o){try{localStorage.setItem(CLOUD_KEY,JSON.stringify(Object.assign(cloudLocal(),o)));}catch(e){}}
+function loadScript(src){return new Promise((res,rej)=>{const s=document.createElement("script");s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+function fsClean(o){return JSON.parse(JSON.stringify(o));}
+function fbDoc(p){const r=FS.doc(p);return{id:r.id,path:p,get:async()=>{const s=await r.get();return{id:s.id,exists:s.exists,data:()=>s.data()};},set:d=>r.set(fsClean(d)),delete:()=>r.delete(),collection:c=>fbCol(p+"/"+c)};}
+function fbCol(p){const r=FS.collection(p);return{path:p,get:async()=>{const q=await r.get();return{docs:q.docs.map(s=>({id:s.id,exists:true,data:()=>s.data()})),size:q.size,empty:q.empty};},doc:id=>fbDoc(p+"/"+id)};}
+const fbDB={doc:fbDoc,collection:fbCol};
+function cloudSay(t){cloud.status=t;setSync(t);}
+function spaceName(id){const s=cloud.spaces.find(x=>x.id===id);return s?s.name:"";}
+async function cloudInit(){
+  if(!HOSTED||!FB_CONFIG||!FB_CONFIG.apiKey)return;
+  try{for(const m of ["app","auth","firestore"])await loadScript(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-${m}-compat.js`);
+    firebase.initializeApp(FB_CONFIG);FBAUTH=firebase.auth();FS=firebase.firestore();cloud.on=true;
+    FBAUTH.getRedirectResult().catch(e=>{if(e&&e.code&&e.code!=="auth/no-auth-event")toast("Google sign-in didn't finish. Try again from the cloud line at the top.");});
+    FBAUTH.onAuthStateChanged(u=>{cloudOnUser(u).catch(e=>{cloudSay("Saved on this phone. Cloud backup will retry.");});});
+  }catch(e){cloudSay("Saved on this phone");}
+}
+async function cloudSignIn(){
+  if(!cloud.on){toast("Cloud backup needs an internet connection. Try again in a moment.");return;}
+  const p=new firebase.auth.GoogleAuthProvider();p.setCustomParameters({prompt:"select_account"});
+  const standalone=window.matchMedia&&matchMedia("(display-mode: standalone)").matches||navigator.standalone;
+  try{if(standalone&&/iPhone|iPad|iPod/.test(navigator.userAgent)){await FBAUTH.signInWithRedirect(p);return;}await FBAUTH.signInWithPopup(p);}
+  catch(e){const c=(e&&e.code)||"";if(/popup-blocked|operation-not-supported|web-storage/.test(c)){await FBAUTH.signInWithRedirect(p);}else if(!/popup-closed|cancelled-popup/.test(c))toast("Sign-in didn't finish. "+((e&&e.message)||""));}
+}
+async function cloudSignOut(){await FBAUTH.signOut();}
+async function cloudOnUser(u){
+  cloud.user=u;
+  if(!u){DB=null;cloud.spaces=[];cloud.ws=null;cloudSay("Saved on this phone");clearInterval(cloudTimer);if(!gate.locked&&!ui.mode)render();return;}
+  cloudSay("Connecting to your cloud backup…");
+  const uref=FS.doc(`users/${u.uid}`);let us=await uref.get();let data=us.exists?us.data():null;
+  const pid="p_"+u.uid;
+  if(!data||!Array.isArray(data.spaces)||!data.spaces.some(s=>s.id===pid)){
+    await FS.doc(`ws/${pid}`).set({owner:u.uid,name:"Just me",shared:false,created:Date.now()},{merge:true});
+    await FS.doc(`ws/${pid}/members/${u.uid}`).set({name:u.displayName||"",email:u.email||"",owner:true});
+    data={spaces:[{id:pid,name:"Just me",shared:false}].concat(((data&&data.spaces)||[]).filter(s=>s.id!==pid)),current:pid};
+    await uref.set(data,{merge:true});}
+  cloud.spaces=data.spaces;
+  const loc=cloudLocal();let want=loc.ws&&cloud.spaces.some(s=>s.id===loc.ws)?loc.ws:(data.current&&cloud.spaces.some(s=>s.id===data.current)?data.current:pid);
+  if(!loc.ws){cloudLocalSet({ws:want});}
+  await activateSpace(want,{first:!loc.ws});
+}
+function freshState(){return{settings:Object.assign(defaults(),{company:S.settings.company||"R&R Assembly Services",vehicles:[{id:"v1",name:"Work truck",mpg:15,fuel:"regular"}]}),estimates:[],draft:newDraft(),deleted:[],pm:{sites:[],deleted:[]},requests:[],jobs:[],invoices:[],docs:[],trips:[],opsDel:{}};}
+function replaceState(o){const f=freshState();Object.keys(S).forEach(k=>delete S[k]);Object.assign(S,f,o||{});if(!S.pm||!Array.isArray(S.pm.sites))S.pm={sites:[],deleted:[]};OPK.forEach(k=>{if(!Array.isArray(S[k]))S[k]=[];});S.opsDel=S.opsDel||{};if(!Array.isArray(S.settings.vehicles)||!S.settings.vehicles.length)S.settings.vehicles=[{id:"v1",name:"Work truck",mpg:15,fuel:"regular"}];}
+function clearDirty(){dirty.settings=false;dirty.draft=false;dirty.est.clear();dirty.del.clear();dirty.sites.clear();dirty.sdel.clear();OPK.forEach(k=>{dOps[k].clear();xOps[k].clear();});dPhotos.clear();}
+async function activateSpace(id,opt){opt=opt||{};
+  const prev=cloudLocal().ws;
+  if(prev&&prev!==id&&!opt.first){try{localStorage.setItem(KEY+"@"+prev,JSON.stringify(S));}catch(e){}
+    let next=null;try{next=JSON.parse(localStorage.getItem(KEY+"@"+id)||"null");}catch(e){}
+    clearDirty();replaceState(opt.copy?clone(opt.copy):next);if(opt.copy){S.settings.u=Date.now();delete S.photosSynced;}
+    try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}mirrorSave();
+    ui.jobId=ui.invId=ui.pmSite=ui.pmMachine=null;}
+  cloud.ws=id;cloudLocalSet({ws:id});
+  if(cloud.user)FS.doc(`users/${cloud.user.uid}`).set({current:id},{merge:true}).catch(()=>{});
+  DB=fbDB;BASE=`ws/${id}/d`;
+  cloudSay(`${spaceName(id)} · syncing…`);
+  try{await pull();lastPull=Date.now();if(!S.photosSynced){(await allPhotoIds()).forEach(p=>dPhotos.add(p));S.photosSynced=true;persist();}flush();cloudSay(`${spaceName(id)} · backed up`);}
+  catch(e){cloudSay(`${spaceName(id)} · saved on phone, will back up when online`);}
+  clearInterval(cloudTimer);cloudTimer=setInterval(()=>{if(!document.hidden)cloudRefresh();},90000);
+  if(!gate.locked&&!ui.mode)render();
+}
+async function cloudRefresh(){if(DB!==fbDB||!cloud.ws||Date.now()-lastPull<20000)return;lastPull=Date.now();try{await pull();cloudSay(`${spaceName(cloud.ws)} · backed up`);}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)cloudRefresh();});
+window.addEventListener("online",()=>{if(DB===fbDB){flush();cloudRefresh();}});
+function newCode(){const a="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";let s="";const r=crypto.getRandomValues(new Uint8Array(8));r.forEach(b=>s+=a[b%a.length]);return s.slice(0,4)+"-"+s.slice(4);}
+async function createShared(name,copy){const u=cloud.user;if(!u)return;const id="s_"+uid();const code=newCode();
+  await FS.doc(`ws/${id}`).set({owner:u.uid,name,shared:true,code,created:Date.now()});
+  await FS.doc(`ws/${id}/members/${u.uid}`).set({name:u.displayName||"",email:u.email||"",owner:true});
+  await FS.doc(`invites/${code}`).set({ws:id,name});
+  cloud.spaces.push({id,name,shared:true,code});await FS.doc(`users/${u.uid}`).set({spaces:cloud.spaces},{merge:true});
+  await activateSpace(id,copy?{copy:clone(S)}:{});toast(`"${name}" is ready. Share the code ${code}.`);}
+async function joinShared(code){const u=cloud.user;if(!u)return;code=String(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");if(code.length!==8){toast("Codes look like ABCD-EFGH.");return;}code=code.slice(0,4)+"-"+code.slice(4);
+  const inv=await FS.doc(`invites/${code}`).get();if(!inv.exists){toast("That code wasn't found. Check it and try again.");return;}
+  const ws=inv.data().ws;if(cloud.spaces.some(s=>s.id===ws)){await activateSpace(ws);return;}
+  await FS.doc(`ws/${ws}/members/${u.uid}`).set({code,name:u.displayName||"",email:u.email||""});
+  const w=await FS.doc(`ws/${ws}`).get();const name=(w.exists&&w.data().name)||inv.data().name||"Shared";
+  cloud.spaces.push({id:ws,name,shared:true,code});await FS.doc(`users/${u.uid}`).set({spaces:cloud.spaces},{merge:true});
+  await activateSpace(ws);toast(`You joined "${name}"`);}
+async function leaveShared(id){const u=cloud.user;const sp=cloud.spaces.find(s=>s.id===id);if(!u||!sp||!sp.shared)return;
+  try{await FS.doc(`ws/${id}/members/${u.uid}`).delete();}catch(e){}
+  cloud.spaces=cloud.spaces.filter(s=>s.id!==id);await FS.doc(`users/${u.uid}`).set({spaces:cloud.spaces},{merge:true});try{localStorage.removeItem(KEY+"@"+id);}catch(e){}
+  await activateSpace("p_"+u.uid);toast(`You left "${sp.name}"`);}
+function inviteText(sp){return`Join "${sp.name}" in the R&R Assembly app:\n1. Open https://rrassembly.github.io and sign in with Google (tap the cloud line at the top).\n2. Tap "Join a shared space" and enter this code: ${sp.code}`;}
+function spacesSheet(){
+  if(!cloud.on)return`<p class="hint" style="font-size:1.05rem">Cloud backup turns on when the app is opened at <b>rrassembly.github.io</b> with an internet connection. Your work is saved on this phone either way.</p>`;
+  if(!cloud.user)return`<div class="stack" style="text-align:center"><div class="glogo" style="margin:0 auto;width:4rem;height:4rem;border-radius:1rem;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700">☁</div>
+    <p style="font-size:1.1rem;margin:0">Sign in once and everything you do is backed up to your own private cloud space, automatically. A new or lost phone? Sign in again and it all comes back.</p>
+    <button class="btn pri wide" data-act="cloudsignin" style="min-height:3.75rem;font-size:1.15rem">Sign in with Google</button><p class="hint">Only you can see your space. You can also share a space with someone, like your stepdad, using a code.</p></div>`;
+  const cur=cloud.ws;let h=`<p class="hint" style="margin:0">Signed in as <b>${esc(cloud.user.email||cloud.user.displayName||"")}</b></p>`;
+  h+=`<section class="sec"><h2><span>Your spaces</span></h2><div class="list">${cloud.spaces.map(s=>`<div class="rem"><button class="rh" data-act="spaceswitch" data-id="${s.id}"><span class="chk" style="pointer-events:none"><input type="radio" tabindex="-1" ${s.id===cur?"checked":""} aria-hidden="true"></span><span style="flex:1;min-width:0"><b style="display:block">${esc(s.name)}</b><small class="muted">${s.shared?"Shared":"Just you"}${s.id===cur?" · open now":""}</small></span><span class="pill ${s.shared?"watch":"ok"}">${s.shared?"Shared":"Private"}</span></button>
+    ${s.shared?`<div class="acts" style="grid-template-columns:1fr 1fr"><button class="btn" data-act="spaceinvite" data-id="${s.id}">Invite: ${esc(s.code||"")}</button><button class="btn${ui.leaveArm===s.id?" danger fill":""}" data-act="spaceleave" data-id="${s.id}">${ui.leaveArm===s.id?"Tap again to leave":"Leave"}</button></div>`:""}</div>`).join("")}</div></section>`;
+  h+=`<details class="more"><summary>Make a shared space</summary><div class="inner"><label class="f">Name<input type="text" id="sp-name" placeholder="R&R team" value="R&R team"></label><label class="chk"><input type="checkbox" id="sp-copy" checked><span>Start it with a copy of everything in "${esc(spaceName(cur))}"</span></label><button class="btn pri" data-act="spacecreate">Make it</button></div></details>`;
+  h+=`<details class="more"><summary>Join a shared space</summary><div class="inner"><label class="f">Code from the invite<input type="text" id="sp-code" placeholder="ABCD-EFGH" autocapitalize="characters" autocomplete="off"></label><button class="btn pri" data-act="spacejoin">Join</button></div></details>`;
+  h+=`<button class="btn" data-act="cloudsignout">Sign out of cloud backup</button><p class="hint">Signing out keeps everything on this phone; it just stops backing up.</p>`;
+  return h;}
+function cloudCard(){if(!cloud.on||cloud.user||S.cloudNudgeOff)return"";
+  return`<div class="card stack" style="border:3px solid var(--accent)"><h2 class="sub-h">☁ Turn on cloud backup</h2><p class="hint" style="color:var(--ink)">Sign in with Google once. After that, everything backs up by itself and comes back on any phone you sign in on.</p><button class="btn pri wide" data-act="cloudsignin" style="min-height:3.5rem">Sign in with Google</button><button class="link" data-act="cloudnudgeoff" style="align-self:center;color:var(--muted);font-weight:400">Not now</button></div>`;}
+async function cloudClick(a,el){
+  const run=async f=>{if(cloud.busy)return;cloud.busy=true;try{await f();}catch(e){toast("That didn't work: "+((e&&e.message)||"check your connection"));}finally{cloud.busy=false;if(ui.sheet==="spaces")renderSheet();}};
+  switch(a){
+    case"spaces":ui.leaveArm=null;ui.sheet="spaces";renderSheet();return true;
+    case"cloudsignin":await cloudSignIn();return true;
+    case"cloudsignout":await run(cloudSignOut);ui.sheet=null;render();return true;
+    case"cloudnudgeoff":S.cloudNudgeOff=true;persist();render();return true;
+    case"spaceswitch":if(el.dataset.id!==cloud.ws)await run(()=>activateSpace(el.dataset.id));ui.sheet=null;render();toast(`Now in "${spaceName(cloud.ws)}"`);return true;
+    case"spacecreate":{const n=((document.getElementById("sp-name")||{}).value||"").trim()||"Shared";const cp=(document.getElementById("sp-copy")||{}).checked;await run(()=>createShared(n,cp));return true;}
+    case"spacejoin":{const c=(document.getElementById("sp-code")||{}).value;await run(()=>joinShared(c));return true;}
+    case"spaceinvite":{const sp=cloud.spaces.find(s=>s.id===el.dataset.id);if(!sp)return true;const t=inviteText(sp);try{if(navigator.share){await navigator.share({title:"Join my space",text:t});return true;}}catch(e){if(e&&e.name==="AbortError")return true;}try{await navigator.clipboard.writeText(t);toast("Invite copied. Paste it into a text.");}catch(e){ui.copyText=t;ui.sheet="copy";renderSheet();}return true;}
+    case"spaceleave":{const id=el.dataset.id;if(ui.leaveArm!==id){ui.leaveArm=id;renderSheet();return true;}ui.leaveArm=null;await run(()=>leaveShared(id));return true;}
+  }
+  return false;}
+
+function draftPath(){return BASE+(DB===fbDB&&cloud.user?"/draft_"+cloud.user.uid:"/draft");}
+async function flushPhotos(){if(DB!==fbDB)return;for(const id of [...dPhotos]){dPhotos.delete(id);const d=await photoGet(id);if(d)await DB.doc(BASE+"/profile/photos/"+id).set({data:d});}}
+function cloudSettingsCard(){if(!cloud.on)return"";
+  const st=cloud.user?`Signed in as <b>${esc(cloud.user.email||"")}</b>. Now using <b>${esc(spaceName(cloud.ws))}</b>.`:"Not signed in. Your work is only on this phone.";
+  return`<div class="card stack"><h2 class="sub-h">☁ Cloud backup and sharing</h2><p class="hint" style="color:var(--ink)">${st}</p><button class="btn ${cloud.user?"":"pri "}wide" data-act="spaces">${cloud.user?"Switch, share or join a space":"Sign in with Google"}</button></div>`;}
+
 /* ---------- toast ---------- */
 let toastT;function toast(t){let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}el.textContent=t;clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),3200);}
 
@@ -2107,7 +2237,7 @@ document.addEventListener("toggle",e=>{if(e.target&&e.target.id==="more")ui.more
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&ui.owner){ui.owner=false;render();}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&ui.sheet==="pin"){e.preventDefault();document.querySelector('[data-act=pincheck]').click();return;}if(e.key==="Escape"&&ui.sheet){ui.sheet=null;ui.imp=null;ui.pmimp=null;ui.copyText=null;renderSheet();}});
 
-window.__app={buildMileagePDF,yearSummary,tripMiles,tripGas,mileRate,gate,gateRec,pinHash,buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
+window.__app={cloud,activateSpace,replaceState,draftPath,spacesSheet,buildMileagePDF,yearSummary,tripMiles,tripGas,mileRate,gate,gateRec,pinHash,buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
 const HOSTED=/^https?:$/.test(location.protocol)&&!/claude|anthropic/i.test(location.hostname);
 if(HOSTED&&!S.settings.appUrl){S.settings.appUrl=location.origin+location.pathname.replace(/index\.html$/,"");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 if(HOSTED&&"serviceWorker" in navigator){const regSW=()=>navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).then(r=>{document.addEventListener("visibilitychange",()=>{if(!document.hidden)r.update().catch(()=>{});});}).catch(()=>{});if(document.readyState==="complete")regSW();else window.addEventListener("load",regSW);setTimeout(regSW,4000);}
@@ -2123,7 +2253,7 @@ if(!PUBLIC){(async()=>{
   if(!LS_HAD){const raw=await mirrorLoad();if(raw){try{const o=JSON.parse(raw);if(o&&o.settings&&o.settings.items){S=Object.assign(S,o);try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}if(!gate.locked)render();toast("Your saved work was brought back");}}catch(e){}}}
   else mirrorSave();
 })();
-setTimeout(()=>connect(0),0);}
+setTimeout(()=>connect(0),0);if(HOSTED)setTimeout(()=>cloudInit(),0);}
 if(!PUBLIC)setTimeout(()=>{try{const n=reminders().length;if(n&&ui.view!=="home")toast(`${n} reminder${n>1?"s":""} on the Home tab`);}catch(e){}},600);
 })();
 </script>
