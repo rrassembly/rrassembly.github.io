@@ -1843,7 +1843,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Enter"&&ui.sheet==="pin"){e.
 window.__app={buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
 const HOSTED=/^https?:$/.test(location.protocol)&&!/claude|anthropic/i.test(location.hostname);
 if(HOSTED&&!S.settings.appUrl){S.settings.appUrl=location.origin+location.pathname.replace(/index\.html$/,"");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
-if(HOSTED&&"serviceWorker" in navigator){window.addEventListener("load",()=>{navigator.serviceWorker.register("sw.js").catch(()=>{});});}
+if(HOSTED&&"serviceWorker" in navigator){const regSW=()=>navigator.serviceWorker.register("sw.js").catch(()=>{});if(document.readyState==="complete")regSW();else window.addEventListener("load",regSW);setTimeout(regSW,4000);}
 let PUBLIC=false;
 try{const hsh=location.hash||"";
   if(hsh.startsWith("#form=")){ui.pubCfg=b64d(hsh.slice(6));ui.mode="public";ui.cf=newCF();PUBLIC=true;}
