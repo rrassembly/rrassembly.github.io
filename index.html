@@ -235,6 +235,23 @@ body.formmode nav.tabs,body.formmode #ownerbtn,body.formmode #barwrap,body.formm
 .stepn{display:inline-flex;align-items:center;justify-content:center;width:1.7rem;height:1.7rem;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:.95rem;margin-right:.5rem;flex:none}
 .formbtn{display:flex;align-items:center;gap:.85rem;width:100%;text-align:left;padding:1rem;border-radius:var(--r);border:2px dashed var(--accent);background:var(--accent-soft);font-weight:700;font-size:1.05rem;color:var(--ink)}
 .formbtn span.mi{background:var(--accent);color:var(--accent-ink)}
+body.locked .app,body.locked #overlay{visibility:hidden}
+#gate{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:1.25rem;overflow-y:auto}
+#gate .gbox{width:100%;max-width:22rem;display:flex;flex-direction:column;align-items:center;gap:1rem;text-align:center}
+#gate .glogo{width:4.5rem;height:4.5rem;border-radius:1.1rem;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:1.35rem}
+#gate h1{margin:0;font-size:1.4rem}
+#gate .gsub{margin:0;color:var(--muted);min-height:1.5em}
+#gate .gdots{display:flex;gap:.7rem;justify-content:center;min-height:1.2rem}
+#gate .gdots span{width:1rem;height:1rem;border-radius:50%;border:2px solid var(--muted)}
+#gate .gdots span.on{background:var(--ink);border-color:var(--ink)}
+#gate .gdots.shake{animation:gshake .35s}
+@keyframes gshake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){#gate .gdots.shake{animation:none}}
+#gate .gpad{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;width:100%}
+#gate .gpad button{min-height:4rem;border-radius:16px;border:2px solid var(--line);background:var(--surface);font-size:1.6rem;font-weight:700;color:var(--ink)}
+#gate .gpad button:active{background:var(--accent-soft)}
+#gate .gpad .gsm{font-size:1.05rem}
+#gate .ghid{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
 textarea.copy{min-height:12rem;font-family:ui-monospace,Menlo,monospace;font-size:.85rem}
 @media (prefers-reduced-motion:no-preference){.chip,.btn,.step button{transition:transform .08s}.step button:active,.btn:active,.chip:active{transform:scale(.96)}}
 </style>
@@ -295,14 +312,23 @@ function newDraft(){return{id:uid(),u:Date.now(),created:Date.now(),customer:"",
 
 /* ---------- state ---------- */
 let S={settings:defaults(),estimates:[],draft:newDraft(),deleted:[]};
-try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&o.settings&&o.settings.items)S=Object.assign(S,o);}}catch(e){}
+let LS_HAD=false;
+try{const raw=localStorage.getItem(KEY);if(raw){const o=JSON.parse(raw);if(o&&o.settings&&o.settings.items){S=Object.assign(S,o);LS_HAD=true;}}}catch(e){}
 if(!S.pm||!Array.isArray(S.pm.sites))S.pm={sites:[],deleted:[]};
 const ui={owner:false,pmSite:null,pmMachine:null,pmq:"",pmimp:null,copyText:null,view:"home",svc:"move",psvc:"move",q:"",sheet:null,imp:null,armed:null,showJob:false,addCustom:false};
 const dirty={settings:false,draft:false,est:new Set(),del:new Set(S.deleted||[]),sites:new Set(),sdel:new Set(S.pm.deleted||[])};
 
 let saveT=null;
+/* second copy of everything, kept in the phone's database storage */
+let mirrorP=null,mirrorT=null;
+function mirrorDB(){if(!mirrorP)mirrorP=new Promise((res,rej)=>{try{const r=indexedDB.open("rr-data",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});return mirrorP;}
+function mirrorSave(){clearTimeout(mirrorT);mirrorT=setTimeout(async()=>{try{const db=await mirrorDB();db.transaction("kv","readwrite").objectStore("kv").put(JSON.stringify(S),"state");}catch(e){}},800);}
+async function mirrorLoad(){try{const db=await mirrorDB();return await new Promise((res)=>{const r=db.transaction("kv").objectStore("kv").get("state");r.onsuccess=()=>res(r.result||null);r.onerror=()=>res(null);});}catch(e){return null;}}
+function hasData(){return S.estimates.length||(S.jobs||[]).length||(S.invoices||[]).length||S.pm.sites.length||(S.requests||[]).length||!S.settings.sample;}
 function persist(){
+  S.lastChange=Date.now();
   try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}
+  mirrorSave();
   clearTimeout(saveT);saveT=setTimeout(flush,700);
 }
 function touchSettings(){S.settings.u=Date.now();dirty.settings=true;persist();}
@@ -452,7 +478,8 @@ function viewEstimate(){
 function backupCard(){
   const lb=S.lastBackup?new Date(S.lastBackup):null;const days=lb?Math.floor((Date.now()-lb)/864e5):null;
   return`<div class="card stack"><h2 class="sub-h">Backup</h2>
-  <p class="hint">Everything saves on this phone by itself. A backup is a spare copy you can keep in your files or move to a new phone.</p>
+  <p class="hint">Everything saves on this phone by itself, in two places, every time you change something. A backup file is your safety copy to keep in your Files or Google Drive, or to move everything to a new phone.</p>
+  <p class="hint" id="storestat">${ui.storeStat||""}</p>
   <div class="${!lb||days>=14?"note":"hint"}">${lb?`Last backup: ${esc(lb.toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}))}${days>=14?". Time to make a new one.":""}`:"You haven't made a backup yet."}</div>
   <button class="btn pri wide" data-act="backupfile">Save a backup</button>
   <details class="more" style="border:0"><summary style="padding:.5rem 0;font-size:1rem">Other backup options</summary><div class="inner" style="padding:0">
@@ -494,6 +521,10 @@ function viewPrices(){
   h+=ui.addItem?`<div class="card stack"><h2 class="sub-h">Add equipment</h2><input type="text" id="a-name" placeholder="Name, e.g. Hip thrust machine" aria-label="Equipment name"><div class="row2"><select id="a-cat" aria-label="Group">${cats.map(c=>`<option>${esc(c)}</option>`).join("")}<option value="__new">New group…</option></select><div class="money"><input type="text" inputmode="decimal" id="a-price" placeholder="${esc(SVN[ps])} price" aria-label="${esc(SVN[ps])} price"></div></div><div class="btns"><button class="btn" data-act="additemcancel">Cancel</button><button class="btn pri" data-act="additem">Add</button></div></div>`:`<button class="btn add" data-act="additemopen">+ Add equipment</button>`;
   h+=`<section class="sec"><h2><span>Extra charges</span></h2><div class="list">${st.extras.map(e=>`<div class="prow"><input type="text" id="en-${e.id}" data-ename="${e.id}" value="${esc(e.name)}" aria-label="Charge name"><div class="money"><input type="text" inputmode="decimal" id="ep-${e.id}" data-eprice="${e.id}" value="${+e.price||""}" aria-label="${esc(e.name)} price"></div><button class="del" data-act="delextra" data-id="${e.id}" aria-label="Delete ${esc(e.name)}">${ICON.trash}</button><div class="sub">Charged <input type="text" id="eu-${e.id}" data-eunit="${e.id}" value="${esc(e.unit)}" aria-label="How it's charged"></div></div>`).join("")}
   <div class="addpart"><button class="btn add" data-act="addextra">+ Add an extra charge</button></div></div></section>`;
+  h+=`<div class="card stack"><h2 class="sub-h">App lock</h2><p class="hint">A PIN is needed every time the app is opened, and again after it sits in the background for 5 minutes. Customers using a form link don't need it.</p>
+  <button class="btn wide" data-act="gatelock">Lock the app now</button>
+  <details class="more" style="border:0"><summary style="padding:.4rem 0;font-size:1rem">Change the app PIN</summary><div class="inner" style="padding:0">
+  <label class="f">Current PIN<input type="password" inputmode="numeric" id="g-cur" autocomplete="off"></label><label class="f">New PIN (4 to 10 numbers)<input type="password" inputmode="numeric" id="g-new" autocomplete="off"></label><label class="f">New PIN again<input type="password" inputmode="numeric" id="g-new2" autocomplete="off"></label><button class="btn pri" data-act="gatechange">Change PIN</button><p class="hint">This changes the PIN on this phone only.</p></div></details></div>`;
   h+=backupCard();
   h+=`<button class="btn danger" data-act="resetprices">Reset to the sample price list</button>`;
   return h;
@@ -685,8 +716,8 @@ function applyImport(){
 function backupObj(){return{app:"gym-estimator",v:2,exported:Date.now(),settings:S.settings,estimates:S.estimates,draft:S.draft,pm:{sites:S.pm.sites},requests:S.requests,jobs:S.jobs,invoices:S.invoices,docs:S.docs};}
 function backupText(){return JSON.stringify(backupObj());}
 async function backupTextFull(){const o=backupObj();o.photos={};for(const id of await allPhotoIds()){const d=await photoGet(id);if(d)o.photos[id]=d;}return JSON.stringify(o);}
-function backupName(){const d=new Date();const p=n=>String(n).padStart(2,"0");return`estimates-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;}
-function markBackup(){S.lastBackup=Date.now();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}render();}
+function backupName(){const d=new Date();const p=n=>String(n).padStart(2,"0");return`rr-assembly-backup-${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}.json`;}
+function markBackup(){S.lastBackup=Date.now();S.backupSnooze="";mirrorSave();try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}render();}
 async function saveBackupFile(){
   const text=await backupTextFull(),name=backupName();
   try{if(window.claude&&claude.use){const dl=await claude.use("downloads");if(dl){await dl.save({filename:name,data:text});markBackup();toast("Backup saved");return;}}}
@@ -1220,9 +1251,17 @@ function invRow(v){const t=invTotals(v),s=invStatus(v);return`<button class="est
 function reqCard(r){return`<div class="rem"><div class="rh" style="cursor:default"><span class="dot ${r.kind==="service"?"down":""}" aria-hidden="true"></span><span style="flex:1;min-width:0"><b style="display:block">${esc(REQN[r.kind]||"Request")}: ${esc(r.custName||"No name")}</b><small class="muted">${esc(r.note||"")}${r.phone?` · ${esc(r.phone)}`:""}${r.want?` · wants ${esc(fmtDate(r.want))}`:""}${r.source?` · ${esc(r.source)}`:""}</small>${r.details?`<button class="link" data-act="reqdetail" data-id="${r.id}" style="min-height:0;padding:.3rem 0 0">See their full form</button>`:""}</span></div>
   <div class="acts"><button class="btn pri" data-act="reqjob" data-id="${r.id}">Make a job</button><button class="btn" data-act="reqest" data-id="${r.id}">Estimate</button><button class="btn" data-act="reqclose" data-id="${r.id}">Close</button></div></div>`;}
 
+function backupNudge(){
+  if(!hasData())return`<div class="card stack" style="border:3px solid var(--accent)"><h2 class="sub-h">New phone, or starting over?</h2><p class="hint">If you have a backup file from this app, load it here and everything comes back: prices, customers, jobs and invoices.</p><label class="btn pri filebtn wide">Load my backup file<input type="file" accept=".json,.txt,application/json,text/plain" data-act="restorefile" aria-label="Load a backup file"></label></div>`;
+  const lb=S.lastBackup||0,days=lb?Math.floor((Date.now()-lb)/864e5):null;
+  const due=!lb||((S.lastChange||0)>lb&&days>=7);
+  if(!due||(S.backupSnooze&&S.backupSnooze>=today()))return"";
+  return`<div class="card stack" style="border:3px solid var(--warn)"><h2 class="sub-h">Back up your work to your phone</h2><p class="hint" style="color:var(--ink)">${lb?`Your last backup was ${days} days ago.`:"You haven't saved a backup yet."} Everything saves on this phone by itself, but a backup file is your safety copy if the phone is lost, replaced, or its browser data gets cleared. Save it to your Files or Google Drive.</p>
+  <button class="btn pri wide" data-act="backupfile" style="min-height:3.5rem">Save a backup now</button><button class="btn wide" data-act="backupsnooze">Remind me tomorrow</button></div>`;}
 function viewHome(){
   genAgreementRequests();
   const t=today();let h=`<div><h2 class="sub-h" style="font-size:1.5rem">Today</h2><div class="muted" style="font-weight:700">${esc(weekday(t))}</div></div>`;
+  h+=backupNudge();
   h+=`<div class="qgrid"><button class="qbtn" data-act="newreq"><span aria-hidden="true">${ICON.inbox}</span>New request</button><button class="qbtn" data-act="newjob"><span aria-hidden="true">${ICON.clip}</span>New job</button><button class="qbtn" data-act="view" data-v="estimate"><span aria-hidden="true">${ICON.calc}</span>New estimate</button><button class="qbtn" data-act="newcust"><span aria-hidden="true">${ICON.user}</span>New customer</button></div>
   <button class="formbtn" data-act="cfhub"><span class="mi" aria-hidden="true">${ICON.doc}</span><span style="flex:1">Customer request form<small class="muted" style="display:block;font-weight:400">Let a customer fill in their own request</small></span><span class="chev" aria-hidden="true">›</span></button>`;
   const todays=S.jobs.filter(j=>j.status!=="done"&&j.date&&j.date<=t).sort((a,b)=>(a.date+(a.time||"")).localeCompare(b.date+(b.time||"")));
@@ -1716,6 +1755,37 @@ async function cformClick(a,el){const c=ui.cf;
   }
   return false;}
 
+/* ---------- App lock: a PIN is needed to open the app on any device ---------- */
+const GATE_SALT="rr-assembly-gate-v1",GATE_ITER=150000,GATE_DEFAULT={h:"362a1409d9a2f2004073e25e7346c0c545702e39df718e84245f00f9bb1502fb",n:7};
+const GATE_KEY=KEY+".gate",GATE_SES=KEY+".unlocked";
+function gateRec(){try{const r=JSON.parse(localStorage.getItem(GATE_KEY)||"null");if(r&&r.h)return r;}catch(e){}return GATE_DEFAULT;}
+async function pinHash(pin){const enc=new TextEncoder();const km=await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveBits"]);const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:enc.encode(GATE_SALT),iterations:GATE_ITER,hash:"SHA-256"},km,256);return[...new Uint8Array(bits)].map(b=>b.toString(16).padStart(2,"0")).join("");}
+const gate={locked:false,entry:"",fails:0,until:0,hiddenAt:0,after:[]};
+function gateCan(){return!!(window.crypto&&crypto.subtle);}
+function gateIsUnlocked(){try{return sessionStorage.getItem(GATE_SES)==="1";}catch(e){return false;}}
+function gateShow(){gate.locked=true;gate.entry="";document.body.classList.add("locked");let g=document.getElementById("gate");if(!g){g=document.createElement("div");g.id="gate";g.setAttribute("role","dialog");g.setAttribute("aria-modal","true");g.setAttribute("aria-label","Enter PIN");document.body.appendChild(g);}gateDraw();}
+function gateDraw(msg){const g=document.getElementById("gate");if(!g)return;const n=Math.max(gateRec().n||4,gate.entry.length);const wait=Math.max(0,Math.ceil((gate.until-Date.now())/1000));
+  g.innerHTML=`<div class="gbox"><div class="glogo" aria-hidden="true">R&amp;R</div><h1>${esc(S.settings.company||"R&R Assembly Services")}</h1><p class="gsub">${wait?`Too many tries. Wait ${wait} seconds.`:esc(msg||"Enter your PIN to open the app")}</p>
+  <div class="gdots${msg&&!wait?" shake":""}" aria-live="polite" aria-label="${gate.entry.length} digits entered">${Array.from({length:n},(_,i)=>`<span class="${i<gate.entry.length?"on":""}"></span>`).join("")}</div>
+  <input id="gate-in" type="password" inputmode="numeric" autocomplete="off" aria-label="PIN" value="" class="ghid">
+  <div class="gpad">${[1,2,3,4,5,6,7,8,9].map(d=>`<button data-gk="${d}" aria-label="${d}">${d}</button>`).join("")}<button data-gk="clr" aria-label="Clear" class="gsm">Clear</button><button data-gk="0" aria-label="0">0</button><button data-gk="del" aria-label="Delete last digit" class="gsm">⌫</button></div>
+  <button class="btn pri wide" data-gk="ok" style="min-height:3.5rem;font-size:1.15rem">Unlock</button></div>`;
+  if(wait)setTimeout(()=>gate.locked&&gateDraw(),1000);}
+async function gateTry(){if(Date.now()<gate.until){gateDraw();return;}const pin=gate.entry;if(!pin)return;
+  const h=await pinHash(pin);if(h===gateRec().h){gate.locked=false;gate.fails=0;try{sessionStorage.setItem(GATE_SES,"1");}catch(e){}document.body.classList.remove("locked");const g=document.getElementById("gate");if(g)g.remove();const run=gate.after.splice(0);run.forEach(f=>f());render();return;}
+  gate.fails++;gate.entry="";if(gate.fails>=5)gate.until=Date.now()+Math.min(300,30*Math.pow(2,gate.fails-5))*1000;gateDraw("That PIN isn't right. Try again.");}
+function gateKey(k){if(!gate.locked)return;if(Date.now()<gate.until)return;
+  if(k==="ok"){gateTry();return;}if(k==="del")gate.entry=gate.entry.slice(0,-1);else if(k==="clr")gate.entry="";else if(/^\d$/.test(k)&&gate.entry.length<10)gate.entry+=k;
+  gateDraw();if(gate.entry.length>=(gateRec().n||99))gateTry();}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-gk]");if(b){e.stopPropagation();gateKey(b.dataset.gk);}},true);
+document.addEventListener("keydown",e=>{if(!gate.locked)return;if(/^\d$/.test(e.key))gateKey(e.key);else if(e.key==="Backspace")gateKey("del");else if(e.key==="Enter")gateKey("ok");else return;e.preventDefault();e.stopPropagation();},true);
+document.addEventListener("visibilitychange",()=>{if(ui.mode==="public")return;if(document.hidden){gate.hiddenAt=Date.now();}else if(gate.hiddenAt&&Date.now()-gate.hiddenAt>5*60*1000&&!gate.locked&&gateCan()){try{sessionStorage.removeItem(GATE_SES);}catch(e){}gateShow();}});
+async function gateChange(cur,next,again){if(!/^\d{4,10}$/.test(next)){toast("The new PIN must be 4 to 10 numbers.");return false;}if(next!==again){toast("The new PINs don't match.");return false;}
+  if(await pinHash(cur)!==gateRec().h){toast("Your current PIN isn't right.");return false;}
+  try{localStorage.setItem(GATE_KEY,JSON.stringify({h:await pinHash(next),n:next.length}));}catch(e){toast("Couldn't save the new PIN on this phone.");return false;}
+  toast("App PIN changed on this phone");return true;}
+function gateLockNow(){try{sessionStorage.removeItem(GATE_SES);}catch(e){}ui.owner=false;gateShow();}
+
 /* ---------- toast ---------- */
 let toastT;function toast(t){let el=document.querySelector(".toast");if(!el){el=document.createElement("div");el.className="toast";el.setAttribute("role","status");document.body.appendChild(el);}el.textContent=t;clearTimeout(toastT);toastT=setTimeout(()=>el.remove(),3200);}
 
@@ -1757,6 +1827,9 @@ document.addEventListener("click",async e=>{
     case"delextra":S.settings.extras=S.settings.extras.filter(x=>x.id!==el.dataset.id);touchSettings();render();break;
     case"resetprices":if(ui.armed!=="reset"){askConfirm("reset",el);break;}ui.armed=null;{const keep={company:S.settings.company,phone:S.settings.phone,taxRate:S.settings.taxRate};S.settings=Object.assign(defaults(),keep);touchSettings();render();}break;
     case"applyimport":applyImport();break;
+    case"gatelock":gateLockNow();break;
+    case"backupsnooze":S.backupSnooze=addDays(today(),1);persist();render();break;
+    case"gatechange":{const v=id=>(document.getElementById(id)||{}).value||"";if(await gateChange(v("g-cur"),v("g-new"),v("g-new2")))render();break;}
     case"senddoc":sendEstimatePDF();break;
     case"previewdoc":ensureEstimateNo(S.draft);ui.sheet="doc";renderSheet();break;
     case"removelogo":delete S.settings.logo;delete S.settings.logoW;delete S.settings.logoH;touchSettings();render();break;
@@ -1840,17 +1913,22 @@ document.addEventListener("toggle",e=>{if(e.target&&e.target.id==="more")ui.more
 document.addEventListener("visibilitychange",()=>{if(document.hidden&&ui.owner){ui.owner=false;render();}});
 document.addEventListener("keydown",e=>{if(e.key==="Enter"&&ui.sheet==="pin"){e.preventDefault();document.querySelector('[data-act=pincheck]').click();return;}if(e.key==="Escape"&&ui.sheet){ui.sheet=null;ui.imp=null;ui.pmimp=null;ui.copyText=null;renderSheet();}});
 
-window.__app={buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
+window.__app={gate,gateRec,pinHash,buildFormPDF,formConfig,b64e,b64d,importRequestCode,cfSummary,pDetect,pParse,pBuild,invData,invTotals,invStatus,genAgreementRequests,reminders,buildPDF,docData,detectPM,parsePM,S,ui,detect,parseSheet,calc,applyImport,render};
 const HOSTED=/^https?:$/.test(location.protocol)&&!/claude|anthropic/i.test(location.hostname);
 if(HOSTED&&!S.settings.appUrl){S.settings.appUrl=location.origin+location.pathname.replace(/index\.html$/,"");try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 if(HOSTED&&"serviceWorker" in navigator){const regSW=()=>navigator.serviceWorker.register("sw.js").catch(()=>{});if(document.readyState==="complete")regSW();else window.addEventListener("load",regSW);setTimeout(regSW,4000);}
 let PUBLIC=false;
 try{const hsh=location.hash||"";
   if(hsh.startsWith("#form=")){ui.pubCfg=b64d(hsh.slice(6));ui.mode="public";ui.cf=newCF();PUBLIC=true;}
-  else if(hsh.startsWith("#add=")){const r=importRequestCode(hsh);try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}if(r){ui.view="home";setTimeout(()=>toast(`Request from ${r.custName} added`),300);}}
+  else if(hsh.startsWith("#add=")){try{history.replaceState(null,"",location.pathname+location.search);}catch(e){}const doAdd=()=>{const r=importRequestCode(hsh);if(r){ui.view="home";render();setTimeout(()=>toast(`Request from ${r.custName} added`),300);}};if(gateCan()&&!gateIsUnlocked())gate.after.push(doAdd);else doAdd();}
 }catch(e){}
+if(!PUBLIC&&gateCan()&&!gateIsUnlocked())gateShow();
 render();
-if(!PUBLIC){try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
+if(!PUBLIC){(async()=>{
+  try{const kept=navigator.storage&&navigator.storage.persist?await navigator.storage.persist():false;ui.storeStat=kept?"✓ This phone has agreed to keep the app's data.":"Tip: install the app on your home screen so the phone keeps its data safe.";}catch(e){}
+  if(!LS_HAD){const raw=await mirrorLoad();if(raw){try{const o=JSON.parse(raw);if(o&&o.settings&&o.settings.items){S=Object.assign(S,o);try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}if(!gate.locked)render();toast("Your saved work was brought back");}}catch(e){}}}
+  else mirrorSave();
+})();
 setTimeout(()=>connect(0),0);}
 if(!PUBLIC)setTimeout(()=>{try{const n=reminders().length;if(n&&ui.view!=="home")toast(`${n} reminder${n>1?"s":""} on the Home tab`);}catch(e){}},600);
 })();
